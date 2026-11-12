@@ -74,8 +74,8 @@
 
                 <select name="estado" class="form-select form-select-sm" style="width: auto; min-width: 150px;">
                     <option value="">Todos los estados</option>
-                    <option value="Perdido" selected="@(ViewBag.EstadoActual == "Perdido" ? "selected" : null)">🔴 Perdido</option>
-                    <option value="Encontrado" selected="@(ViewBag.EstadoActual == "Encontrado" ? "selected" : null)">🟢 Encontrado</option>
+                    <option value="Perdido" selected="@(ViewBag.EstadoActual == "Perdido" ? "selected" : null)">🔴 Abierto</option>
+                    <option value="Encontrado" selected="@(ViewBag.EstadoActual == "Encontrado" ? "selected" : null)">🟢 Resuelto</option>
                 </select>
 
                 <button type="submit" class="btn btn-sm btn-altoke">
@@ -129,13 +129,13 @@
                             @if (obj.Estado == GRUPAL.Models.EstadoObjeto.Perdido)
                             {
                                 <span class="badge badge-estado-perdido shadow-sm">
-                                    <i class="bi bi-exclamation-circle me-1"></i>Perdido
+                                    <i class="bi bi-exclamation-circle me-1"></i>Abierto
                                 </span>
                             }
                             else
                             {
                                 <span class="badge badge-estado-encontrado shadow-sm">
-                                    <i class="bi bi-check-circle me-1"></i>Encontrado
+                                    <i class="bi bi-check-circle me-1"></i>Resuelto
                                 </span>
                             }
                         </div>
@@ -144,6 +144,7 @@
                             <span class="badge badge-categoria mb-2 align-self-start">
                                 @obj.Categoría
                             </span>
+                            <span class="badge bg-secondary mb-2">@obj.TipoVisible</span>
                             <h5 class="card-title fw-bold"><a asp-controller="Explorar" asp-action="Detalle" asp-route-id="@obj.Id" class="text-decoration-none text-dark stretched-link">@obj.Título</a></h5>
                             <p class="card-text text-muted flex-grow-1">
                                 @(obj.Descripcion.Length > 120 ? obj.Descripcion.Substring(0, 120) + "..." : obj.Descripcion)

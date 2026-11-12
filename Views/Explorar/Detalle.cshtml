@@ -26,7 +26,7 @@
         <div class="col-lg-6">
             <div class="d-flex gap-2 mb-3 flex-wrap">
                 <span class="badge badge-categoria">@Model.Categoría</span>
-                <span class="badge @(Model.Estado == EstadoObjeto.Perdido ? "badge-estado-perdido" : "badge-estado-encontrado")">@Model.Estado</span>
+                <span class="badge @(Model.Estado == EstadoObjeto.Perdido ? "badge-estado-perdido" : "badge-estado-encontrado")">@Model.EstadoVisible</span><span class="badge bg-secondary">@Model.TipoVisible</span>
             </div>
             <h1 class="fw-bold mb-3">@Model.Título</h1>
             <p class="text-muted">@Model.Descripcion</p>
@@ -51,7 +51,7 @@
                     {
                         <form asp-controller="ObjetosPerdidos" asp-action="Cerrar" method="post">
                             @Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id" />
-                            <button class="btn btn-altoke" type="submit">Marcar recuperado</button>
+                            <button class="btn btn-altoke" type="submit">Cerrar caso · Objeto entregado o recuperado</button>
                         </form>
                     }
                 }
@@ -60,7 +60,7 @@
             {
                 <div class="card shadow-sm border-0 bg-light mt-4">
                     <div class="card-body">
-                        <h5 class="fw-bold mb-2">¿Crees que puedes ayudar a recuperarlo?</h5>
+                        <h5 class="fw-bold mb-2">¿Este aviso corresponde al objeto que buscas o encontraste?</h5>
                         @if (!sesion.HasValue)
                         {
                             <p class="text-muted mb-3">Inicia sesión para contactar al autor de este reporte.</p>
@@ -78,7 +78,7 @@
                                 <input type="hidden" name="id" value="@Model.Id" />
                                 <label class="form-label" for="mensajeRecuperacion">Explica por qué crees que es el objeto correcto</label>
                                 <textarea id="mensajeRecuperacion" name="mensaje" class="form-control mb-3" minlength="10" maxlength="1000" rows="3" required placeholder="Describe alguna característica para coordinar con el autor..."></textarea>
-                                <button type="submit" class="btn btn-altoke">Enviar solicitud</button>
+                                <button type="submit" class="btn btn-altoke">Contactar al autor</button>
                             </form>
                         }
                     </div>
@@ -86,16 +86,6 @@
             }
         </div>
     </div>
-    @if (sesion.HasValue && !dueno && Model.Estado == EstadoObjeto.Perdido)
-    {
-        <form asp-controller="Notificaciones" asp-action="LoVi" method="post" class="card p-3 mt-4">
-            @Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id" />
-            <h3 class="h5">Lo vi</h3>
-            <label for="lugarVisto">¿Dónde lo viste?</label><input id="lugarVisto" name="lugar" maxlength="200" required class="form-control" />
-            <label for="horaVista">Fecha y hora en Perú</label><input id="horaVista" name="vistoEn" type="datetime-local" max="@DateTime.UtcNow.AddHours(-5).ToString("yyyy-MM-ddTHH:mm")" required class="form-control" />
-            <button class="btn btn-altoke mt-2">Avisar al dueño</button>
-        </form>
-    }
     @if (Model.Latitud.HasValue && Model.Longitud.HasValue)
     {
         <div id="mapaUbicacion" style="height:320px" data-lat="@Model.Latitud.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-lng="@Model.Longitud.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)"></div>

@@ -5,7 +5,7 @@
 <div class="container py-4"><div class="row justify-content-center"><div class="col-lg-8">
     <h1 class="fw-bold mb-1">Editar publicación</h1><p class="text-muted mb-4">Actualiza los detalles de tu aviso en AlToke.</p>
     <form asp-action="Editar" asp-route-id="@Model.Id" method="post" class="card border-0 shadow-sm p-4 rounded-4">
-        @Html.AntiForgeryToken()<div asp-validation-summary="All" class="text-danger"></div>
+        @Html.AntiForgeryToken()<label asp-for="TipoPublicacion">Tipo de publicación</label><select asp-for="TipoPublicacion" class="form-select"><option value="0">Soy el dueño · Perdí mi objeto</option><option value="1">Encontré un objeto · Busco a su dueño</option></select><div asp-validation-summary="All" class="text-danger"></div>
         <div class="mb-3"><label class="form-label fw-semibold" asp-for="Título">Título</label><input asp-for="Título" class="form-control" maxlength="150" required /></div>
         <div class="mb-3"><label class="form-label fw-semibold" asp-for="Categoría">Categoría</label><select asp-for="Categoría" class="form-select" required><option>Electrónicos</option><option>Documentos</option><option>Ropa</option><option>Accesorios</option><option>Llaves</option><option>Mascotas</option><option>Otros</option></select></div>
         <div class="mb-3"><label class="form-label fw-semibold" asp-for="Descripcion">Descripción</label><textarea asp-for="Descripcion" class="form-control" rows="5" maxlength="3000" required></textarea></div>

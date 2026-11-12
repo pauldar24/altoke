@@ -200,6 +200,9 @@ namespace GRUPAL.Migrations
                     b.Property<double?>("Longitud")
                         .HasColumnType("REAL");
 
+                    b.Property<int>("TipoPublicacion")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Título")
                         .IsRequired()
                         .HasMaxLength(150)
