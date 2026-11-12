@@ -508,3 +508,8 @@ body {
 .altoke-chat-form { display: flex; gap: .4rem; padding: .6rem; border-top: 1px solid #eee; }
 .altoke-chat-form .form-control { min-width: 0; }
 .altoke-chat-disclaimer { font-size: .67rem; color: #888; text-align: center; margin: 0; padding: .2rem .6rem .65rem; }
+
+/* Tipo de publicación: dueño, hallazgo o pendiente de revisión. */
+.badge-tipo-publicacion { background-color: #59636e; color: #fff; white-space: normal; line-height: 1.4; }
+.badge-tipo-publicacion[data-tipo="0"] { background-color: #1558a6; }
+.badge-tipo-publicacion[data-tipo="1"] { background-color: #7040a0; }

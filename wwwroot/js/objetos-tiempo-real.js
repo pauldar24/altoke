@@ -55,7 +55,11 @@
     categoria.className = "badge badge-categoria mb-2 align-self-start";
     categoria.textContent = objeto.categoria || "Otros";
     cuerpo.appendChild(categoria);
-    const tipo = document.createElement("p"); tipo.className = "small fw-bold"; tipo.textContent = objeto.tipoPublicacion || "Publicado por el dueño · Busca su objeto"; cuerpo.appendChild(tipo);
+    const tipo = document.createElement("span");
+    tipo.className = "badge badge-tipo-publicacion mb-2";
+    tipo.dataset.tipo = String(objeto.tipoCodigo ?? 2);
+    tipo.textContent = objeto.tipoPublicacion || "Tipo de publicación pendiente de revisar";
+    cuerpo.appendChild(tipo);
 
     const titulo = document.createElement("h5");
     titulo.className = inicio ? "card-title fw-bold text-dark mb-2" : "card-title fw-bold";

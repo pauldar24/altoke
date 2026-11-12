@@ -144,7 +144,7 @@
                             <span class="badge badge-categoria mb-2 align-self-start">
                                 @obj.Categoría
                             </span>
-                            <span class="badge bg-secondary mb-2">@obj.TipoVisible</span>
+                            <span class="badge badge-tipo-publicacion mb-2" data-tipo="@((int)obj.TipoPublicacion)">@obj.TipoVisible</span>
                             <h5 class="card-title fw-bold"><a asp-controller="Explorar" asp-action="Detalle" asp-route-id="@obj.Id" class="text-decoration-none text-dark stretched-link">@obj.Título</a></h5>
                             <p class="card-text text-muted flex-grow-1">
                                 @(obj.Descripcion.Length > 120 ? obj.Descripcion.Substring(0, 120) + "..." : obj.Descripcion)

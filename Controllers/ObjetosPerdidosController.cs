@@ -119,6 +119,7 @@ public class ObjetosPerdidosController : Controller
             fecha = objeto.Fecha,
             estado = objeto.EstadoVisible,
             tipoPublicacion = objeto.TipoVisible,
+            tipoCodigo = (int)objeto.TipoPublicacion,
             fotoUrl = objeto.FotoUrl,
             autor = HttpContext.Session.GetString("UsuarioNombre") ?? "Anónimo"
         });
