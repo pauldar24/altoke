@@ -8,6 +8,7 @@ public class Notificacion
     public Usuario? Usuario { get; set; }
     public int ObjetoPerdidoId { get; set; }
     public ObjetoPerdido? ObjetoPerdido { get; set; }
+    public int? SolicitudRecuperacionId { get; set; }
     public int InformanteId { get; set; }
     [MaxLength(500)] public string Texto { get; set; } = "";
     public DateTime VistoEn { get; set; }

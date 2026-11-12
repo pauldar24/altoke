@@ -122,6 +122,9 @@ namespace GRUPAL.Migrations
                     b.Property<int>("ObjetoPerdidoId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("SolicitudRecuperacionId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Texto")
                         .IsRequired()
                         .HasMaxLength(500)

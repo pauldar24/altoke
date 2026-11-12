@@ -131,12 +131,28 @@ public class ObjetosPerdidosController : Controller
     {
         var usuario = HttpContext.Session.GetInt32("UsuarioId");
         if (usuario is null) return RedirectToAction("Ingresar", "Cuenta");
+        await using var transaccion = await _context.Database.BeginTransactionAsync();
         var objeto = await _context.ObjetosPerdidos.FindAsync(id);
         if (objeto is null) return NotFound();
         if (objeto.UsuarioId != usuario.Value) return StatusCode(StatusCodes.Status403Forbidden);
 
+        if (objeto.Estado == EstadoObjeto.Encontrado) return RedirectToAction("Detalle", "Explorar", new { id });
         objeto.Estado = EstadoObjeto.Encontrado;
+        var solicitudes = await _context.SolicitudesRecuperacion.Where(s => s.ObjetoPerdidoId == id).ToListAsync();
+        foreach (var solicitud in solicitudes)
+        {
+            _context.Notificaciones.Add(new Notificacion {
+                UsuarioId = solicitud.SolicitanteId, InformanteId = usuario.Value, ObjetoPerdidoId = id,
+                SolicitudRecuperacionId = solicitud.Id, Texto = $"El caso de {objeto.Título} fue cerrado como resuelto."
+            });
+        }
         await _context.SaveChangesAsync();
+        await transaccion.CommitAsync();
+        foreach (var destinatario in solicitudes.Select(s => s.SolicitanteId).Distinct())
+        {
+            try { await _objetosHub.Clients.Group($"usuario-{destinatario}").SendAsync("NotificacionRecibida"); }
+            catch { /* La campana recupera la notificación persistida al reconectar. */ }
+        }
         TempData["Exito"] = "Caso cerrado. El objeto fue entregado o recuperado.";
         return RedirectToAction("Detalle", "Explorar", new { id });
     }

@@ -23,6 +23,8 @@
     }
     panel.addEventListener('show.bs.dropdown', cargar);
     cargar();
+    window.addEventListener('focus', cargar);
+    setInterval(() => { if (!document.hidden) cargar(); }, 30000);
     if (window.signalR) {
         const conexion = new signalR.HubConnectionBuilder().withUrl('/hubs/objetos').withAutomaticReconnect().build();
         conexion.on('NotificacionRecibida', cargar);

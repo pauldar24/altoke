@@ -39,6 +39,9 @@ public class CuentaController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CrearCuenta(string nombre, string correo, string contraseña)
     {
+        if (HttpContext.Session.GetInt32("UsuarioId").HasValue) return RedirectToAction("Index", "Home");
+        ViewBag.Nombre = nombre;
+        ViewBag.Correo = correo;
         if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contraseña))
         {
             ViewBag.Error = "Todos los campos son obligatorios.";
@@ -47,10 +50,17 @@ public class CuentaController : Controller
 
         nombre = nombre.Trim();
         correo = correo.Trim().ToLowerInvariant();
-        if (nombre.Length > 100 || correo.Length > 150 || contraseña.Length < 8 || contraseña.Length > 128)
+        if (nombre.Length > 100 || correo.Length > 150 || !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(correo) || contraseña.Length < 8 || contraseña.Length > 128)
         {
             ViewBag.Error = "Usa un nombre y correo válidos y una contraseña de entre 8 y 128 caracteres.";
             return View();
+        }
+        var existente = await _context.Usuarios.SingleOrDefaultAsync(u => u.Correo == correo);
+        if (existente is not null && existente.Contraseña.StartsWith("AQAAAA", StringComparison.Ordinal) && _hasher.VerifyHashedPassword(existente, existente.Contraseña, contraseña) != PasswordVerificationResult.Failed)
+        {
+            HttpContext.Session.SetInt32("UsuarioId", existente.Id);
+            HttpContext.Session.SetString("UsuarioNombre", existente.Nombre);
+            return RedirectToAction("Index", "Home");
         }
         if (!await _turnstile.VerificarAsync(Request.Form["cf-turnstile-response"], "registro"))
         { ViewBag.Error = "Completa la verificación antiabuso. Si no aparece, contacta al administrador."; return View(); }
@@ -73,7 +83,16 @@ public class CuentaController : Controller
 
         nuevoUsuario.Contraseña = _hasher.HashPassword(nuevoUsuario, contraseña);
         _context.Usuarios.Add(nuevoUsuario);
-        await _context.SaveChangesAsync();
+        try { await _context.SaveChangesAsync(); }
+        catch (DbUpdateException)
+        {
+            _context.Entry(nuevoUsuario).State = EntityState.Detached;
+            var creado = await _context.Usuarios.SingleOrDefaultAsync(u => u.Correo == correo);
+            if (creado is null) throw;
+            if (!creado.Contraseña.StartsWith("AQAAAA", StringComparison.Ordinal) || _hasher.VerifyHashedPassword(creado, creado.Contraseña, contraseña) == PasswordVerificationResult.Failed)
+            { ViewBag.Error = "Este correo ya tiene una cuenta. Usa Ingresar."; return View(); }
+            nuevoUsuario = creado;
+        }
 
         // Iniciar sesión automáticamente
         HttpContext.Session.SetInt32("UsuarioId", nuevoUsuario.Id);

@@ -28,6 +28,7 @@ public class NotificacionesController(ApplicationDbContext db) : Controller
         if (aviso is null) return NotFound();
         aviso.Leida = true;
         await db.SaveChangesAsync();
+        if (aviso.SolicitudRecuperacionId.HasValue) return RedirectToAction("Index", "Recuperaciones", new { solicitud = aviso.SolicitudRecuperacionId });
         return RedirectToAction("Detalle", "Explorar", new { id = aviso.ObjetoPerdidoId });
     }
 

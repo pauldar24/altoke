@@ -65,7 +65,7 @@
                                 <div class="dropdown-menu dropdown-menu-end p-2" id="listaNotificaciones" style="width:320px;max-height:400px;overflow:auto"></div>
                             </li>
                             <li class="nav-item"><a class="nav-link text-dark" asp-controller="Favoritos" asp-action="Index">Favoritos</a></li>
-                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Recuperaciones" asp-action="Index">Recuperaciones <span id="contadorRecuperaciones" class="badge bg-danger" hidden></span></a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Recuperaciones" asp-action="Index">Solicitudes y seguimiento <span id="contadorRecuperaciones" class="badge bg-danger" hidden></span></a></li>
                             <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Contacto">Contacto</a></li>
                         }
                         @if (Context.Session.GetInt32("UsuarioId").HasValue)
