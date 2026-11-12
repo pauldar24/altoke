@@ -125,6 +125,21 @@ public class ObjetosPerdidosController : Controller
         return RedirectToAction("Detalle", "Explorar", new { id = objeto.Id });
     }
 
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cerrar(int id)
+    {
+        var usuario = HttpContext.Session.GetInt32("UsuarioId");
+        if (usuario is null) return RedirectToAction("Ingresar", "Cuenta");
+        var objeto = await _context.ObjetosPerdidos.FindAsync(id);
+        if (objeto is null) return NotFound();
+        if (objeto.UsuarioId != usuario.Value) return StatusCode(StatusCodes.Status403Forbidden);
+
+        objeto.Estado = EstadoObjeto.Encontrado;
+        await _context.SaveChangesAsync();
+        TempData["Exito"] = "Caso cerrado. El objeto fue entregado o recuperado.";
+        return RedirectToAction("Detalle", "Explorar", new { id });
+    }
+
     public async Task<IActionResult> Editar(int id)
     {
         var usuario = HttpContext.Session.GetInt32("UsuarioId");
