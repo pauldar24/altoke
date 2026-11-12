@@ -50,6 +50,22 @@ public static class DbSeeder
     {
         var correos = new[] { "carlos.mendoza@usmp.pe", "maria.fernandez@usmp.pe", "jose.quispe@usmp.pe", "analucia.torres@usmp.pe", "diego.ramirez@usmp.pe", "valentina.chavez@usmp.pe", "andres.paredes@usmp.pe", "camila.rojas@usmp.pe", "luis.garcia@usmp.pe", "sofia.huaman@usmp.pe", "fernando.castillo@usmp.pe", "isabella.vargas@usmp.pe" };
         var ids = await context.Usuarios.Where(u => correos.Contains(u.Correo)).Select(u => u.Id).ToArrayAsync();
+        // Actualizar sólo el catálogo ilustrado anterior, sin modificar estado, fecha ni historial.
+        if (ids.Length > 0)
+        {
+            var ilustradas = await context.ObjetosPerdidos.Where(o => ids.Contains(o.UsuarioId)
+                && o.FotoUrl != null && o.FotoUrl.StartsWith("/images/demo/") && o.FotoUrl.EndsWith(".svg")).ToListAsync();
+            var fotos = CrearMuestras(ids);
+            foreach (var aviso in ilustradas)
+            {
+                var nueva = fotos.FirstOrDefault(o => o.FotoUrl == aviso.FotoUrl!.Replace(".svg", ".jpg"));
+                if (nueva == null) continue;
+                aviso.FotoUrl = nueva.FotoUrl;
+                aviso.Título = nueva.Título;
+                aviso.Descripcion = nueva.Descripcion;
+            }
+            await context.SaveChangesAsync();
+        }
         var antiguas = await context.ObjetosPerdidos.Where(o => ids.Contains(o.UsuarioId)
             && o.FotoUrl != null && o.FotoUrl.StartsWith("https://picsum.photos/seed/")
             && !context.SolicitudesRecuperacion.Any(r => r.ObjetoPerdidoId == o.Id)
@@ -70,12 +86,12 @@ public static class DbSeeder
         var hoy = DateTime.UtcNow.AddHours(-5).Date;
         return new List<ObjetoPerdido>
         {
-            new() { Título = "Audífonos inalámbricos negros", Categoría = "Electrónicos", Descripcion = "Perdí mis audífonos de diadema negros al salir de la biblioteca. Tienen almohadillas grises y una pequeña marca de uso en el lado derecho. Imagen ilustrativa de muestra.", Ubicacion = "Biblioteca central", FotoUrl = "/images/demo/audifonos.svg", TipoPublicacion = TipoPublicacion.Dueno },
-            new() { Título = "Mochila negra con bolsillo frontal", Categoría = "Accesorios", Descripcion = "Encontré una mochila negra con bolsillo frontal y cierre naranja en una banca. La entregué a seguridad; quien sea su dueño puede describir su contenido por chat privado. Imagen ilustrativa de muestra.", Ubicacion = "Patio principal", FotoUrl = "/images/demo/mochila.svg", TipoPublicacion = TipoPublicacion.Hallazgo },
-            new() { Título = "Laptop plateada de 14 pulgadas", Categoría = "Electrónicos", Descripcion = "Olvidé mi laptop plateada de 14 pulgadas en una mesa de estudio. Tiene una pequeña marca en la esquina de la tapa y estaba dentro de una funda gris. Imagen ilustrativa de muestra.", Ubicacion = "Sala de estudio", FotoUrl = "/images/demo/laptop.svg", TipoPublicacion = TipoPublicacion.Dueno },
-            new() { Título = "Carnet universitario", Categoría = "Documentos", Descripcion = "Encontré un carnet universitario cerca de la cafetería y lo dejé en seguridad. Por privacidad no publico el nombre ni el código; el dueño puede identificarse por chat privado. Imagen ficticia sin datos personales.", Ubicacion = "Cafetería", FotoUrl = "/images/demo/carnet.svg", TipoPublicacion = TipoPublicacion.Hallazgo },
-            new() { Título = "Llaves de auto con control negro", Categoría = "Llaves", Descripcion = "Perdí mis llaves de auto con control negro de dos botones y una argolla metálica. La argolla tiene una pequeña marca roja. Posiblemente se quedaron cerca del estacionamiento. Imagen ilustrativa de muestra.", Ubicacion = "Estacionamiento", FotoUrl = "/images/demo/llaves.svg", TipoPublicacion = TipoPublicacion.Dueno },
-            new() { Título = "Cargador blanco USB-C", Categoría = "Electrónicos", Descripcion = "Encontré un cargador blanco USB-C con cable gris conectado junto a una mesa. Está en seguridad; el dueño puede indicar la potencia y alguna característica para reconocerlo. Imagen ilustrativa de muestra.", Ubicacion = "Aula de informática", FotoUrl = "/images/demo/cargador.svg", TipoPublicacion = TipoPublicacion.Hallazgo }
+            new() { Título = "Audífonos inalámbricos negros", Categoría = "Electrónicos", Descripcion = "Perdí mis audífonos de diadema negros al salir de la biblioteca. Tienen almohadillas oscuras y una pequeña marca de uso en el lado derecho. Fotografía referencial para esta publicación de prueba.", Ubicacion = "Biblioteca central", FotoUrl = "/images/demo/audifonos.jpg", TipoPublicacion = TipoPublicacion.Dueno },
+            new() { Título = "Mochila negra y marrón con bolsillo frontal", Categoría = "Accesorios", Descripcion = "Encontré una mochila oscura con bolsillo frontal y asas de cuero en una banca. La entregué a seguridad; quien sea su dueño puede describir su contenido por chat privado. Fotografía referencial para esta publicación de prueba.", Ubicacion = "Patio principal", FotoUrl = "/images/demo/mochila.jpg", TipoPublicacion = TipoPublicacion.Hallazgo },
+            new() { Título = "Laptop plateada de 14 pulgadas", Categoría = "Electrónicos", Descripcion = "Olvidé mi laptop plateada de 14 pulgadas en una mesa de estudio. Tiene una pequeña marca en la esquina de la tapa y estaba dentro de una funda gris. Fotografía referencial para esta publicación de prueba.", Ubicacion = "Sala de estudio", FotoUrl = "/images/demo/laptop.jpg", TipoPublicacion = TipoPublicacion.Dueno },
+            new() { Título = "Carnet universitario", Categoría = "Documentos", Descripcion = "Encontré un carnet universitario cerca de la cafetería y lo dejé en seguridad. Por privacidad no publico el nombre ni el código; el dueño puede identificarse por chat privado. Fotografía de muestra de un carnet sin datos personales.", Ubicacion = "Cafetería", FotoUrl = "/images/demo/carnet.jpg", TipoPublicacion = TipoPublicacion.Hallazgo },
+            new() { Título = "Llaves de auto con control negro", Categoría = "Llaves", Descripcion = "Perdí mis llaves de auto con control negro y varias llaves y una argolla metálica. La argolla tiene una pequeña marca roja. Posiblemente se quedaron cerca del estacionamiento. Fotografía referencial para esta publicación de prueba.", Ubicacion = "Estacionamiento", FotoUrl = "/images/demo/llaves.jpg", TipoPublicacion = TipoPublicacion.Dueno },
+            new() { Título = "Cargador blanco USB-C", Categoría = "Electrónicos", Descripcion = "Encontré un cargador blanco USB con su cable conectado junto a una mesa. Está en seguridad; el dueño puede indicar la potencia y alguna característica para reconocerlo. Fotografía referencial para esta publicación de prueba.", Ubicacion = "Aula de informática", FotoUrl = "/images/demo/cargador.jpg", TipoPublicacion = TipoPublicacion.Hallazgo }
         }.Select((o, i) => { o.UsuarioId = usuarios[i % usuarios.Length]; o.Fecha = hoy.AddDays(-i); o.Estado = EstadoObjeto.Perdido; return o; }).ToList();
     }
 

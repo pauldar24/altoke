@@ -114,3 +114,38 @@ body .altoke-chat-heading { background: linear-gradient(120deg, #f46500, #ff8a30
 body .card:not(.card-objeto) { border-color: #f0e2d6; box-shadow: 0 10px 35px #b7782310; }
 body .form-control:focus, body .form-select:focus { border-color: #ff7b1c; box-shadow: 0 0 0 4px #ff7b1c20; }
 @media (max-width: 575.98px) { body .hero-section { border-radius: 0 0 24px 24px; } }
+
+/* Catálogo fotográfico: el objeto gana protagonismo sin cambiar la cuadrícula. */
+body .card-objeto .card-img-top {
+  height: 240px;
+  object-fit: cover;
+  background: #edf2f7;
+  border-bottom: 1px solid #f0e5db;
+}
+body .card-objeto img[src$="mochila.jpg"] { object-position: 45% 65%; }
+body .card-objeto img[src$="llaves.jpg"] { object-position: 50% 55%; }
+body .card-objeto img[src$="laptop.jpg"] { object-position: 50% 72%; }
+body .card-objeto img[src$="carnet.jpg"] { object-fit: contain; background: #f3f4f5; }
+body .card-objeto .card-title { font-size: 1.15rem; line-height: 1.4; }
+body .card-objeto .card-title a { color: #20374c; text-decoration: none; }
+body .card-objeto .card-title a:hover { color: #c34500; text-decoration: underline; }
+body .card-objeto .card-body { padding: 1.3rem; }
+body .badge-tipo-publicacion { border-radius: 8px; padding: .45rem .6rem; font-size: .78rem; font-weight: 600; }
+body .badge-estado-perdido { background: #c52643; box-shadow: 0 2px 8px #35101d20; }
+body .badge-estado-encontrado { background: #087c58; box-shadow: 0 2px 8px #08352120; }
+body .hero-section .input-group { border: 5px solid #ffffff38; border-radius: 18px; background: #fff; box-shadow: 0 14px 28px #9e34002b !important; }
+body .hero-section .input-group .input-group-text { border-radius: 12px 0 0 12px; }
+body .hero-section .input-group .btn { border-radius: 0 12px 12px 0; }
+body .hero-section .input-group .form-control { box-shadow: none; }
+body .como-funciona-step { border: 1px solid #ffddbf; border-radius: 22px; background: #fff; height: 100%; }
+body .como-funciona-step .step-number { box-shadow: 0 6px 0 #ffcf9e; }
+body .section-title { letter-spacing: -.04em; }
+body .pagination .page-link { border-radius: 10px; margin: 0 3px; }
+body .navbar-altoke .nav-link { padding-inline: .7rem; }
+@media (hover: hover) {
+  body .card-objeto:hover .card-title a { color: #c34500; }
+}
+@media (max-width: 575.98px) {
+  body .card-objeto .card-img-top { height: 215px; }
+  body .hero-section .input-group { border-width: 3px; }
+}
