@@ -112,3 +112,7 @@ La revisión de claridad no evalúa satisfacción, identidad, veracidad ni propi
 La tercera contiene los tres modelos y los ajustes finales de evaluación.
 Integrar en este orden, o integrar directamente la tercera en main.
 Falta la prueba de las funciones sobre el despliegue de Render después de fusionar.
+
+### Consejos de descripción contextuales
+
+El modelo ML.NET mantiene su evaluación binaria de detalle suficiente. El mensaje de ayuda se construye mediante reglas que reconocen colores, algunas marcas, rasgos y ubicación en los campos del formulario. No es texto generado por un modelo de lenguaje ni extracción semántica completa. Si reconoce un dato, no vuelve a solicitarlo. Por ejemplo, «Mochila negra» reconoce el color y propone otros detalles. Cambiar título, descripción o ubicación invalida la ayuda anterior.

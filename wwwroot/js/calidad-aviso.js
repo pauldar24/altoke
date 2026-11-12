@@ -3,8 +3,10 @@
     const salida = document.getElementById('resultadoDescripcion');
     const descripcion = document.getElementById('descripcionObjeto');
     if (!boton || !salida || !descripcion) return;
+    const titulo = document.getElementById('tituloObjeto');
+    const ubicacion = boton.closest('form').querySelector('[name="Ubicacion"]');
     let version = 0;
-    descripcion.addEventListener('input', () => { version++; salida.hidden = true; });
+    for (const campo of [descripcion, titulo, ubicacion]) campo?.addEventListener('input', () => { version++; salida.hidden = true; });
     boton.addEventListener('click', async () => {
         if (boton.disabled) return;
         const texto = descripcion.value.trim();
@@ -13,6 +15,8 @@
         const revision = version;
         const datos = new FormData();
         datos.set('descripcion', texto);
+        datos.set('titulo', titulo?.value || '');
+        datos.set('ubicacion', ubicacion?.value || '');
         datos.set('__RequestVerificationToken', boton.closest('form').querySelector('[name="__RequestVerificationToken"]').value);
         boton.disabled = true; salida.textContent = 'Revisando los detalles…';
         try {
