@@ -12,6 +12,7 @@ namespace GRUPAL.Controllers;
 
 public class ObjetosPerdidosController : Controller
 {
+    private readonly ModeloCalidadAvisoService _calidad;
     private readonly ModeracionService _moderacion;
     private readonly ApplicationDbContext _context;
     private readonly IConfiguration _config;
@@ -20,14 +21,30 @@ public class ObjetosPerdidosController : Controller
     private readonly IHubContext<ObjetosHub> _objetosHub;
 
     public ObjetosPerdidosController(ApplicationDbContext context, IConfiguration config, IWebHostEnvironment env,
-        CategoriaObjetoService categoriaObjeto, IHubContext<ObjetosHub> objetosHub, ModeracionService moderacion)
+        CategoriaObjetoService categoriaObjeto, IHubContext<ObjetosHub> objetosHub, ModeracionService moderacion, ModeloCalidadAvisoService calidad)
     {
         _context = context;
         _moderacion = moderacion;
+        _calidad = calidad;
         _config = config;
         _env = env;
         _categoriaObjeto = categoriaObjeto;
         _objetosHub = objetosHub;
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public IActionResult EvaluarDescripcion(string descripcion)
+    {
+        if (!HttpContext.Session.GetInt32("UsuarioId").HasValue) return Unauthorized();
+        if (string.IsNullOrWhiteSpace(descripcion) || descripcion.Length is < 10 or > 3000)
+            return BadRequest("Escribe una descripción de entre 10 y 3000 caracteres.");
+        var resultado = _calidad.TieneDetalle(descripcion);
+        return Json(new { detalleSuficiente = resultado, recomendacion = resultado switch
+        {
+            true => "La descripción aporta características que pueden ayudar a reconocer el objeto. Comprueba que sean correctas.",
+            false => "Podrías añadir color, marca, rasgos particulares y ubicación aproximada. Evita publicar datos personales.",
+            _ => "La revisión no está disponible. Puedes continuar revisando la descripción manualmente."
+        } });
     }
 
     [HttpGet]

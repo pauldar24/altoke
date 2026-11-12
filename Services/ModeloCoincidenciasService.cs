@@ -25,7 +25,7 @@ public sealed class ModeloCoincidenciasService(IWebHostEnvironment env, ILogger<
             try
             {
                 var directorio = env.IsProduction() ? "/app/data/ml" : Path.Combine(env.ContentRootPath, "ML", "Models");
-                var ruta = Path.Combine(directorio, "coincidencias-v1.zip");
+                var ruta = Path.Combine(directorio, "coincidencias-v2.zip");
                 ITransformer modelo;
                 if (File.Exists(ruta)) modelo = _ml.Model.Load(ruta, out _);
                 else
@@ -34,12 +34,19 @@ public sealed class ModeloCoincidenciasService(IWebHostEnvironment env, ILogger<
                     var evaluacion = Leer("coincidencias-eval.jsonl");
                     var datos = _ml.Data.LoadFromEnumerable(entrenamiento);
                     var pipeline = _ml.Transforms.Concatenate("Features", nameof(Entrada.Titulo), nameof(Entrada.Descripcion),
-                        nameof(Entrada.Categoria), nameof(Entrada.Ubicacion))
+                        nameof(Entrada.Categoria), nameof(Entrada.Ubicacion), nameof(Entrada.ConflictoColor))
                         .Append(_ml.BinaryClassification.Trainers.SdcaLogisticRegression());
                     modelo = pipeline.Fit(datos);
-                    var metricas = _ml.BinaryClassification.Evaluate(modelo.Transform(_ml.Data.LoadFromEnumerable(evaluacion)));
-                    logger.LogInformation("ML coincidencias piloto: entrenamiento {Train}, evaluación separada {Eval}, precisión {Precision:F3}, exhaustividad {Recall:F3}, F1 {F1:F3}.",
-                        entrenamiento.Count, evaluacion.Count, metricas.PositivePrecision, metricas.PositiveRecall, metricas.F1Score);
+                    using var evaluador = _ml.Model.CreatePredictionEngine<Entrada, Salida>(modelo);
+                    var resultados = evaluacion.Select(e => (Real: e.Label, Pred: evaluador.Predict(e).Probabilidad >= 0.65f)).ToList();
+                    var tp = resultados.Count(r => r.Real && r.Pred);
+                    var fp = resultados.Count(r => !r.Real && r.Pred);
+                    var fn = resultados.Count(r => r.Real && !r.Pred);
+                    var precision = tp / (double)Math.Max(1, tp + fp);
+                    var recall = tp / (double)Math.Max(1, tp + fn);
+                    var f1 = precision + recall == 0 ? 0 : 2 * precision * recall / (precision + recall);
+                    logger.LogInformation("ML coincidencias piloto: entrenamiento {Train}, evaluación separada {Eval}, umbral 0.65, precisión {Precision:F3}, exhaustividad {Recall:F3}, F1 {F1:F3}.",
+                        entrenamiento.Count, evaluacion.Count, precision, recall, f1);
                     try { Directory.CreateDirectory(directorio); _ml.Model.Save(modelo, datos.Schema, ruta); }
                     catch (IOException) { logger.LogWarning("El modelo de coincidencias funcionará en memoria."); }
                     catch (UnauthorizedAccessException) { logger.LogWarning("Sin permisos para guardar el modelo de coincidencias; se usa memoria."); }
@@ -72,8 +79,17 @@ public sealed class ModeloCoincidenciasService(IWebHostEnvironment env, ILogger<
     private static Entrada CrearEntrada(string ta, string da, string ca, string ua, string tb, string db, string cb, string ub) => new()
     {
         Titulo = Similitud(ta, tb), Descripcion = Similitud(ta + " " + da, tb + " " + db),
-        Categoria = ca.Equals(cb, StringComparison.OrdinalIgnoreCase) ? 1 : 0, Ubicacion = Similitud(ua, ub)
+        Categoria = ca.Equals(cb, StringComparison.OrdinalIgnoreCase) ? 1 : 0, Ubicacion = Similitud(ua, ub), ConflictoColor = ColorIncompatible(ta, tb) ? 1 : 0
     };
+
+    private static bool ColorIncompatible(string a, string b)
+    {
+        static HashSet<string> Colores(string texto) =>
+            Regex.Matches(texto.ToLowerInvariant(), @"\b(negr|blanc|azul|roj|gris|marr|verde|amarill|rosad)\w*")
+                .Select(m => m.Groups[1].Value).ToHashSet();
+        var x = Colores(a); var y = Colores(b);
+        return x.Count > 0 && y.Count > 0 && !x.Overlaps(y);
+    }
 
     private static float Similitud(string a, string b)
     {
@@ -91,7 +107,7 @@ public sealed class ModeloCoincidenciasService(IWebHostEnvironment env, ILogger<
     }
 
     public void Dispose() => _predictor?.Dispose();
-    public sealed class Entrada { public bool Label { get; set; } public float Titulo { get; set; } public float Descripcion { get; set; } public float Categoria { get; set; } public float Ubicacion { get; set; } }
+    public sealed class Entrada { public bool Label { get; set; } public float Titulo { get; set; } public float Descripcion { get; set; } public float Categoria { get; set; } public float Ubicacion { get; set; } public float ConflictoColor { get; set; } }
     public sealed class Salida { [ColumnName("PredictedLabel")] public bool EsCoincidencia { get; set; } [ColumnName("Probability")] public float Probabilidad { get; set; } }
     public sealed class Par
     {

@@ -5,7 +5,7 @@ using Microsoft.ML.Data;
 namespace GRUPAL.Services;
 
 /// <summary>Infraestructura compartida. Cada instancia usa su propio dataset, entrenamiento y artefacto.</summary>
-public sealed class ModeloTextoBinario(string nombre, IWebHostEnvironment env, ILogger logger) : IDisposable
+public sealed class ModeloTextoBinario(string nombre, IWebHostEnvironment env, ILogger logger, float umbral = 0.5f) : IDisposable
 {
     private readonly MLContext _ml = new(seed: 91);
     private readonly object _candado = new();
@@ -34,9 +34,16 @@ public sealed class ModeloTextoBinario(string nombre, IWebHostEnvironment env, I
                     var pipeline = _ml.Transforms.Text.FeaturizeText("Features", nameof(Fila.Texto))
                         .Append(_ml.BinaryClassification.Trainers.SdcaLogisticRegression());
                     modelo = pipeline.Fit(datos);
-                    var metricas = _ml.BinaryClassification.Evaluate(modelo.Transform(_ml.Data.LoadFromEnumerable(evaluacion)));
-                    logger.LogInformation("ML {Modelo} piloto: entrenamiento {Train}, evaluación separada {Eval}, precisión {Precision:F3}, exhaustividad {Recall:F3}, F1 {F1:F3}.",
-                        nombre, entrenamiento.Count, evaluacion.Count, metricas.PositivePrecision, metricas.PositiveRecall, metricas.F1Score);
+                    using var evaluador = _ml.Model.CreatePredictionEngine<Fila, Salida>(modelo);
+                    var resultados = evaluacion.Select(e => (Real: e.Label, Pred: evaluador.Predict(e).Probabilidad >= umbral)).ToList();
+                    var tp = resultados.Count(r => r.Real && r.Pred);
+                    var fp = resultados.Count(r => !r.Real && r.Pred);
+                    var fn = resultados.Count(r => r.Real && !r.Pred);
+                    var precision = tp / (double)Math.Max(1, tp + fp);
+                    var recall = tp / (double)Math.Max(1, tp + fn);
+                    var f1 = precision + recall == 0 ? 0 : 2 * precision * recall / (precision + recall);
+                    logger.LogInformation("ML {Modelo} piloto: entrenamiento {Train}, evaluación separada {Eval}, umbral {Umbral}, precisión {Precision:F3}, exhaustividad {Recall:F3}, F1 {F1:F3}.",
+                        nombre, entrenamiento.Count, evaluacion.Count, umbral, precision, recall, f1);
                     try { Directory.CreateDirectory(directorio); _ml.Model.Save(modelo, datos.Schema, ruta); }
                     catch (IOException) { logger.LogWarning("Modelo {Modelo} disponible en memoria.", nombre); }
                     catch (UnauthorizedAccessException) { logger.LogWarning("Modelo {Modelo} disponible en memoria; falta permiso de escritura.", nombre); }

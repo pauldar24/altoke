@@ -74,7 +74,7 @@ public class HomeController : Controller
         var posibleSpam = _spam.EsSpam(contacto.Asunto + ". " + contacto.Mensaje);
         contacto.Clasificacion = posibleSpam == true ? "Posible spam (ML)" :
             await _moderacion.ClasificarContactoAsync(contacto.Asunto + ". " + contacto.Mensaje);
-        contacto.EsSpam = posibleSpam == true || contacto.Clasificacion == "Spam/abuso";
+        contacto.EsSpam = contacto.Clasificacion == "Spam/abuso";
         contacto.Sentimiento = "No aplica";
         contacto.Archivado = false;
         contacto.Atendido = false;

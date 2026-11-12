@@ -23,6 +23,7 @@ builder.Services.AddScoped<RecomendadorObjetos>();
 builder.Services.AddSingleton<CategoriaObjetoService>();
 builder.Services.AddSingleton<ModeloCoincidenciasService>();
 builder.Services.AddSingleton<ModeloSpamService>();
+builder.Services.AddSingleton<ModeloCalidadAvisoService>();
 builder.Services.AddScoped<AsistenteAlToke>();
 builder.Services.AddScoped<AlgoliaObjetosService>();
 builder.Services.AddHttpClient();
@@ -148,6 +149,7 @@ await app.Services.GetRequiredService<CategoriaObjetoService>().PredecirAsync("a
 
 app.Services.GetRequiredService<ModeloCoincidenciasService>().Preparar();
 app.Services.GetRequiredService<ModeloSpamService>().Preparar();
+app.Services.GetRequiredService<ModeloCalidadAvisoService>().Preparar();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
