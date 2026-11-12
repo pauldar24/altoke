@@ -1,21 +1,34 @@
 @model List<GRUPAL.Models.SolicitudRecuperacion>
 @using GRUPAL.Models
 @{
-    ViewData["Title"] = "Recuperaciones";
+    ViewData["Title"] = "Solicitudes y seguimiento";
     var usuarioId = (int)ViewBag.UsuarioId;
 }
 <div class="container py-4">
-    <h1 class="fw-bold"><i class="bi bi-arrow-left-right text-altoke me-2"></i>Recuperaciones</h1>
+    <h1 class="fw-bold"><i class="bi bi-arrow-left-right text-altoke me-2"></i>Solicitudes y seguimiento</h1>
     <p class="text-muted mb-4">Solicitudes recibidas en tus publicaciones y mensajes que tú has enviado.</p>
     @if (TempData["Error"] is string error) { <div class="alert alert-danger">@error</div> }
-    @if (!Model.Any()) { <div class="empty-state p-5 text-center text-muted">Todavía no hay solicitudes. <a asp-controller="Explorar" asp-action="Index">Explora publicaciones</a>.</div> }
-    @foreach (var s in Model)
+    <nav class="d-flex gap-2 mb-3"><a asp-action="Index" class="btn btn-outline-primary">Todas</a><a asp-action="Index" asp-route-bandeja="recibidas" class="btn btn-outline-primary">Recibidas en mis publicaciones</a><a asp-action="Index" asp-route-bandeja="enviadas" class="btn btn-outline-primary">Solicitudes que envié</a><a asp-action="Index" asp-route-bandeja="publicaciones" class="btn btn-outline-secondary">Mis publicaciones</a></nav>
+    @if (ViewBag.Bandeja == "publicaciones")
+    {
+        foreach (var aviso in (List<ObjetoPerdido>)ViewBag.Publicaciones)
+        {
+            <article class="card p-3 mb-3">
+                <h2 class="h5">@aviso.Título</h2><p>@aviso.TipoVisible · @aviso.EstadoVisible</p>
+                <div><a asp-controller="Explorar" asp-action="Detalle" asp-route-id="@aviso.Id">Ver publicación</a> ·
+                <a asp-action="Index" asp-route-publicacion="@aviso.Id" asp-route-bandeja="recibidas">Ver solicitudes de esta publicación</a> ·
+                <a asp-controller="ObjetosPerdidos" asp-action="Editar" asp-route-id="@aviso.Id">Editar</a></div>
+            </article>
+        }
+    }
+    @if (!Model.Any() && ViewBag.Bandeja != "publicaciones") { <div class="empty-state p-5 text-center text-muted">Todavía no hay solicitudes. <a asp-controller="Explorar" asp-action="Index">Explora publicaciones</a>.</div> }
+    @foreach (var s in ViewBag.Bandeja == "publicaciones" ? new List<SolicitudRecuperacion>() : Model)
     {
         var esPropietario = s.ObjetoPerdido.UsuarioId == usuarioId;
         <div class="card border-0 shadow-sm mb-3"><div class="card-body">
             <div class="d-flex justify-content-between flex-wrap gap-2 mb-2">
                 <div><span class="badge badge-categoria">@(esPropietario ? "Recibida" : "Enviada")</span><h5 class="fw-bold mt-2 mb-0"><a class="text-dark" asp-controller="Explorar" asp-action="Detalle" asp-route-id="@s.ObjetoPerdidoId">@s.ObjetoPerdido.Título</a></h5></div>
-                <span class="badge align-self-start @(s.Estado == EstadoSolicitud.Pendiente ? "bg-warning text-dark" : s.Estado == EstadoSolicitud.Aceptada ? "bg-success" : "bg-secondary")">@s.Estado</span>
+                <small>@s.ObjetoPerdido.TipoVisible · Caso @s.ObjetoPerdido.EstadoVisible</small><span class="badge align-self-start @(s.Estado == EstadoSolicitud.Pendiente ? "bg-warning text-dark" : s.Estado == EstadoSolicitud.Aceptada ? "bg-success" : "bg-secondary")">@s.Estado</span>
             </div>
             <div class="text-muted small">@(esPropietario ? "Solicita: " + s.Solicitante.Nombre : "Tu solicitud") · @s.CreadoEn.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
             <p class="mt-2 mb-3">@s.Mensaje</p>

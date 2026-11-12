@@ -2,6 +2,7 @@
 @model string
 @if (!string.IsNullOrWhiteSpace(Configuration["Turnstile:SiteKey"]))
 {
-    <div class="cf-turnstile mb-3" data-sitekey="@Configuration["Turnstile:SiteKey"]" data-action="@Model"></div>
+    <div class="cf-turnstile mb-3" data-sitekey="@Configuration["Turnstile:SiteKey"]" data-action="@Model" data-callback="altokeVerificado" data-expired-callback="altokeVerificacionVencida" data-error-callback="altokeVerificacionVencida"></div>
+    <script src="~/js/verificacion-formulario.js" asp-append-version="true"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 }

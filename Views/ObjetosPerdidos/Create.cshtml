@@ -37,8 +37,8 @@
                         </select>
                         <span asp-validation-for="Categoría" class="text-danger"></span>
                         <div id="sugerenciaCategoria" class="alert alert-info py-2 mt-2" hidden aria-live="polite">
-                            Sugerencia del modelo: <strong id="categoriaSugerida"></strong>
-                            <button type="button" id="usarCategoriaSugerida" class="btn btn-sm btn-outline-primary ms-2">Usar sugerencia</button>
+                            Categoría sugerida y aplicada: <strong id="categoriaSugerida"></strong>
+                            <small>Puedes cambiarla en el selector. Se sugiere una sola vez al terminar el título.</small>
                         </div>
                     </div>
                 </div>
@@ -89,41 +89,32 @@
             const texto = document.getElementById('categoriaSugerida');
             const usar = document.getElementById('usarCategoriaSugerida');
             const url = '@Url.Action("SugerirCategoria", "ObjetosPerdidos")';
-            let pausa;
-            let sugerida = '';
-
-            async function pedirSugerencia() {
-                const tituloActual = titulo.value.trim();
-                const descripcionActual = descripcion.value.trim();
-                if ((tituloActual + descripcionActual).length < 8) {
-                    contenedor.hidden = true;
-                    return;
-                }
+            let consultado = false;
+            let seleccionManual = false;
+            categoria.addEventListener('change', () => { seleccionManual = true; });
+            titulo.addEventListener('blur', async () => {
+                const original = titulo.value.trim();
+                if (consultado || seleccionManual || categoria.value || original.length < 8) return;
+                consultado = true;
+                contenedor.hidden = false;
+                texto.textContent = 'Analizando el título…';
                 try {
-                    const parametros = new URLSearchParams({ titulo: tituloActual, descripcion: descripcionActual });
-                    const respuesta = await fetch(`${url}?${parametros}`, { headers: { 'Accept': 'application/json' } });
-                    if (!respuesta.ok || respuesta.status === 204) {
-                        contenedor.hidden = true;
-                        return;
-                    }
+                    const parametros = new URLSearchParams({ titulo: original });
+                    const respuesta = await fetch(`${url}?${parametros}`, {
+                        headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(15000)
+                    });
+                    if (!respuesta.ok || respuesta.status === 204) throw new Error('Sin sugerencia');
                     const resultado = await respuesta.json();
-                    sugerida = resultado.categoria || '';
+                    const sugerida = resultado.categoria;
+                    if (titulo.value.trim() !== original || seleccionManual || categoria.value) {
+                        contenedor.hidden = true; return;
+                    }
+                    if (![...categoria.options].some(o => o.value === sugerida)) throw new Error('Categoría inválida');
+                    categoria.value = sugerida;
                     texto.textContent = sugerida;
-                    contenedor.hidden = !sugerida;
                 } catch {
-                    contenedor.hidden = true;
+                    texto.textContent = 'No disponible. Selecciona la categoría manualmente.';
                 }
-            }
-
-            const programar = () => {
-                window.clearTimeout(pausa);
-                pausa = window.setTimeout(pedirSugerencia, 500);
-            };
-            titulo.addEventListener('input', programar);
-            descripcion.addEventListener('input', programar);
-            usar.addEventListener('click', () => {
-                if (sugerida) categoria.value = sugerida;
-                contenedor.hidden = true;
             });
         })();
     </script>
