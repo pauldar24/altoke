@@ -92,7 +92,8 @@
     }
     @if (relacionados.Any())
     {
-        <h3 class="fw-bold mt-5 mb-3">También podría interesarte</h3>
+        <h3 class="fw-bold mt-5 mb-3">Posibles coincidencias con este objeto</h3>
+        <p class="text-muted">El modelo compara avisos abiertos de dueños con hallazgos. Revisa las características con el autor antes de coordinar una entrega.</p>
         <div class="row g-3">
             @foreach (var obj in relacionados)
             {

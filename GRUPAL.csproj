@@ -18,6 +18,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ML/modelos/*.jsonl" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="ML/categorias_base.csv" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

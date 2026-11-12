@@ -6,10 +6,23 @@ namespace GRUPAL.Services;
 
 /// <summary>Recomendaciones explicables basadas en categoría, ubicación, título y favoritos.
 /// No se usan los pesos ni el dataset de productos de la tienda Demo.</summary>
-public class RecomendadorObjetos(ApplicationDbContext db)
+public class RecomendadorObjetos(ApplicationDbContext db, ModeloCoincidenciasService coincidencias)
 {
     public async Task<List<ObjetoPerdido>> RecomendarAsync(int? usuarioId, int? objetoId = null, int max = 6)
     {
+        if (objetoId.HasValue)
+        {
+            var principal = await db.ObjetosPerdidos.AsNoTracking().FirstOrDefaultAsync(o => o.Id == objetoId);
+            if (principal is null || principal.Estado != EstadoObjeto.Perdido ||
+                principal.TipoPublicacion is not (TipoPublicacion.Dueno or TipoPublicacion.Hallazgo)) return new();
+            var opuesto = principal.TipoPublicacion == TipoPublicacion.Dueno ? TipoPublicacion.Hallazgo : TipoPublicacion.Dueno;
+            var candidatos = await db.ObjetosPerdidos.Include(o => o.Usuario).AsNoTracking()
+                .Where(o => o.Estado == EstadoObjeto.Perdido && o.TipoPublicacion == opuesto && o.UsuarioId != principal.UsuarioId)
+                .OrderByDescending(o => o.Fecha).Take(350).ToListAsync();
+            return candidatos.Select(o => new { Objeto = o, Puntaje = coincidencias.Puntuar(principal, o) })
+                .Where(x => x.Puntaje.HasValue).OrderByDescending(x => x.Puntaje).ThenByDescending(x => x.Objeto.Fecha)
+                .Take(Math.Clamp(max, 1, 12)).Select(x => x.Objeto).ToList();
+        }
         var objetos = await db.ObjetosPerdidos.Include(o => o.Usuario).AsNoTracking()
             .OrderByDescending(o => o.Fecha).Take(350).ToListAsync();
         var favoritas = usuarioId.HasValue

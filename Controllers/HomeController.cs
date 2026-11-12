@@ -11,12 +11,14 @@ public class HomeController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ModeracionService _moderacion;
+    private readonly ModeloSpamService _spam;
     private readonly TurnstileService _turnstile;
 
-    public HomeController(ApplicationDbContext context, ModeracionService moderacion, TurnstileService turnstile)
+    public HomeController(ApplicationDbContext context, ModeracionService moderacion, TurnstileService turnstile, ModeloSpamService spam)
     {
         _context = context;
         _moderacion = moderacion;
+        _spam = spam;
         _turnstile = turnstile;
     }
 
@@ -69,8 +71,10 @@ public class HomeController : Controller
         contacto.Nombre = contacto.Nombre.Trim();
         contacto.Correo = contacto.Correo.Trim();
         contacto.Mensaje = contacto.Mensaje.Trim();
-        contacto.Clasificacion = await _moderacion.ClasificarContactoAsync(contacto.Asunto + ". " + contacto.Mensaje);
-        contacto.EsSpam = contacto.Clasificacion == "Spam/abuso";
+        var posibleSpam = _spam.EsSpam(contacto.Asunto + ". " + contacto.Mensaje);
+        contacto.Clasificacion = posibleSpam == true ? "Posible spam (ML)" :
+            await _moderacion.ClasificarContactoAsync(contacto.Asunto + ". " + contacto.Mensaje);
+        contacto.EsSpam = posibleSpam == true || contacto.Clasificacion == "Spam/abuso";
         contacto.Sentimiento = "No aplica";
         contacto.Archivado = false;
         contacto.Atendido = false;

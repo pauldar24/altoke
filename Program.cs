@@ -21,6 +21,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<RecomendadorObjetos>();
 builder.Services.AddSingleton<CategoriaObjetoService>();
+builder.Services.AddSingleton<ModeloCoincidenciasService>();
+builder.Services.AddSingleton<ModeloSpamService>();
 builder.Services.AddScoped<AsistenteAlToke>();
 builder.Services.AddScoped<AlgoliaObjetosService>();
 builder.Services.AddHttpClient();
@@ -143,6 +145,9 @@ using (var scope = app.Services.CreateScope())
 
 // Preparar el clasificador antes de aceptar peticiones de publicación.
 await app.Services.GetRequiredService<CategoriaObjetoService>().PredecirAsync("audífonos");
+
+app.Services.GetRequiredService<ModeloCoincidenciasService>().Preparar();
+app.Services.GetRequiredService<ModeloSpamService>().Preparar();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
