@@ -12,6 +12,7 @@ namespace GRUPAL.Controllers;
 
 public class ObjetosPerdidosController : Controller
 {
+    private readonly ModeracionService _moderacion;
     private readonly ApplicationDbContext _context;
     private readonly IConfiguration _config;
     private readonly IWebHostEnvironment _env;
@@ -19,9 +20,10 @@ public class ObjetosPerdidosController : Controller
     private readonly IHubContext<ObjetosHub> _objetosHub;
 
     public ObjetosPerdidosController(ApplicationDbContext context, IConfiguration config, IWebHostEnvironment env,
-        CategoriaObjetoService categoriaObjeto, IHubContext<ObjetosHub> objetosHub)
+        CategoriaObjetoService categoriaObjeto, IHubContext<ObjetosHub> objetosHub, ModeracionService moderacion)
     {
         _context = context;
+        _moderacion = moderacion;
         _config = config;
         _env = env;
         _categoriaObjeto = categoriaObjeto;
@@ -55,15 +57,16 @@ public class ObjetosPerdidosController : Controller
         if (string.IsNullOrWhiteSpace(objeto.Título) || objeto.Título.Length > 150 ||
             string.IsNullOrWhiteSpace(objeto.Descripcion) || objeto.Descripcion.Length > 3000 ||
             string.IsNullOrWhiteSpace(objeto.Categoría) || objeto.Categoría.Length > 100 ||
-            objeto.Fecha == default)
+            objeto.Fecha == default || objeto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(objeto.Estado))
         {
             ModelState.AddModelError("", "Completa los datos del reporte con información válida.");
             return View(objeto);
         }
         if (!ModelState.IsValid) return View(objeto);
+        var rechazo = await _moderacion.ValidarObjetoAsync(objeto.Título, objeto.Descripcion);
+        if (rechazo is not null) { ModelState.AddModelError("", rechazo); return View(objeto); }
         objeto.Id = 0;
         objeto.UsuarioId = usuarioId.Value;
-        objeto.Estado = EstadoObjeto.Perdido;
         objeto.Ubicacion = string.IsNullOrWhiteSpace(objeto.Ubicacion) ? "No especificada" : objeto.Ubicacion.Trim();
         if (objeto.Ubicacion.Length > 200) return BadRequest("Ubicación demasiado larga.");
         objeto.FotoUrl = null;
@@ -140,11 +143,14 @@ public class ObjetosPerdidosController : Controller
         if (string.IsNullOrWhiteSpace(datos.Título) || datos.Título.Length > 150 ||
             string.IsNullOrWhiteSpace(datos.Descripcion) || datos.Descripcion.Length > 3000 ||
             string.IsNullOrWhiteSpace(datos.Categoría) || datos.Categoría.Length > 100 ||
-            string.IsNullOrWhiteSpace(datos.Ubicacion) || datos.Ubicacion.Length > 200)
+            string.IsNullOrWhiteSpace(datos.Ubicacion) || datos.Ubicacion.Length > 200 ||
+            datos.Fecha == default || datos.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date)
         {
             ModelState.AddModelError("", "Completa correctamente los campos.");
             return View(obj);
         }
+        var rechazo = await _moderacion.ValidarObjetoAsync(datos.Título, datos.Descripcion);
+        if (rechazo is not null) { ModelState.AddModelError("", rechazo); return View(datos); }
         obj.Título = datos.Título.Trim();
         obj.Categoría = datos.Categoría.Trim();
         obj.Descripcion = datos.Descripcion.Trim();
