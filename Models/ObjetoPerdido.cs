@@ -8,6 +8,9 @@ public class ObjetoPerdido
     public string Descripcion { get; set; } = string.Empty;
     public DateTime Fecha { get; set; }
     public string Ubicacion { get; set; } = string.Empty;
+    public TipoPublicacion TipoPublicacion { get; set; }
+    public string TipoVisible => TipoPublicacion switch { TipoPublicacion.Dueno => "Publicado por el dueño · Busca su objeto", TipoPublicacion.Hallazgo => "Objeto hallado · Busca a su dueño", _ => "Tipo de publicación pendiente de revisar" };
+    public string EstadoVisible => Estado == EstadoObjeto.Perdido ? "Abierto" : "Resuelto";
     public EstadoObjeto Estado { get; set; }
     public double? Latitud { get; set; }
     public double? Longitud { get; set; }

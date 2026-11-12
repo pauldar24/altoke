@@ -186,6 +186,8 @@ public class AdminController : Controller
         if (objeto.Fecha == default || objeto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(objeto.Estado))
         { ModelState.AddModelError("", "La fecha debe ser válida y no futura."); return View(objeto); }
         objetoDb.Fecha = objeto.Fecha;
+        if (objeto.TipoPublicacion is not (TipoPublicacion.Dueno or TipoPublicacion.Hallazgo)) return BadRequest();
+        objetoDb.TipoPublicacion = objeto.TipoPublicacion;
         objetoDb.Estado = objeto.Estado;
 
         await _context.SaveChangesAsync();

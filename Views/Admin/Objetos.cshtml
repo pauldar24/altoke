@@ -62,11 +62,11 @@
                                             </div>
                                         }
                                     </td>
-                                    <td>@item.Título</td>
+                                    <td>@item.Título <small>@item.TipoVisible</small></td>
                                     <td>@item.Categoría</td>
                                     <td>
                                         <span class="badge @(item.Estado == GRUPAL.Models.EstadoObjeto.Perdido ? "bg-danger" : "bg-success")">
-                                            @item.Estado
+                                            @item.EstadoVisible
                                         </span>
                                     </td>
                                     <td>@item.Fecha.ToString("dd/MM/yyyy")</td>

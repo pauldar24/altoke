@@ -43,7 +43,7 @@ public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.Moder
     {
         var usuario = HttpContext.Session.GetInt32("UsuarioId");
         if (!usuario.HasValue) return Unauthorized(new { error = "Inicia sesión para publicar." });
-        if (dto.Fecha == default || dto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(dto.Estado))
+        if (dto.Fecha == default || dto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(dto.Estado) || dto.TipoPublicacion is not (TipoPublicacion.Dueno or TipoPublicacion.Hallazgo))
             return BadRequest(new { error = "La fecha debe ser válida y no puede ser futura." });
         if (!Coordenadas.Validas(dto.Latitud, dto.Longitud)) return BadRequest(new { error = "Coordenadas inválidas." });
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -52,7 +52,7 @@ public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.Moder
         var obj = new ObjetoPerdido
         {
             Latitud = dto.Latitud, Longitud = dto.Longitud, Título = dto.Titulo.Trim(), Categoría = dto.Categoria.Trim(), Descripcion = dto.Descripcion.Trim(),
-            Ubicacion = dto.Ubicacion.Trim(), Fecha = dto.Fecha, Estado = dto.Estado, UsuarioId = usuario.Value
+            Ubicacion = dto.Ubicacion.Trim(), Fecha = dto.Fecha, TipoPublicacion = dto.TipoPublicacion, Estado = EstadoObjeto.Perdido, UsuarioId = usuario.Value
         };
         db.ObjetosPerdidos.Add(obj);
         await db.SaveChangesAsync();
@@ -65,7 +65,7 @@ public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.Moder
         var obj = await db.ObjetosPerdidos.FindAsync(id);
         if (obj is null) return NotFound();
         if (!Autorizado(obj.UsuarioId)) return Unauthorized(new { error = "No tienes permiso para editar este aviso." });
-        if (dto.Fecha == default || dto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(dto.Estado))
+        if (dto.Fecha == default || dto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(dto.Estado) || dto.TipoPublicacion is not (TipoPublicacion.Dueno or TipoPublicacion.Hallazgo))
             return BadRequest(new { error = "La fecha debe ser válida y no puede ser futura." });
         if (!Coordenadas.Validas(dto.Latitud, dto.Longitud)) return BadRequest(new { error = "Coordenadas inválidas." });
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -79,6 +79,7 @@ public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.Moder
         obj.Ubicacion = dto.Ubicacion.Trim();
         obj.Fecha = dto.Fecha;
         obj.Estado = dto.Estado;
+        obj.TipoPublicacion = dto.TipoPublicacion;
         await db.SaveChangesAsync();
         return NoContent();
     }
@@ -99,7 +100,7 @@ public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.Moder
 
     private static ObjetoDto Mapear(ObjetoPerdido o) => new()
     {
-        Latitud = o.Latitud, Longitud = o.Longitud, Id = o.Id, Titulo = o.Título, Categoria = o.Categoría, Descripcion = o.Descripcion,
+        Latitud = o.Latitud, Longitud = o.Longitud, TipoPublicacion = o.TipoPublicacion, Id = o.Id, Titulo = o.Título, Categoria = o.Categoría, Descripcion = o.Descripcion,
         Ubicacion = o.Ubicacion, Fecha = o.Fecha, Estado = o.Estado, FotoUrl = o.FotoUrl, Autor = o.Usuario?.Nombre
     };
 }

@@ -142,6 +142,7 @@
                             <div class="mb-2">
                                 <span class="badge badge-categoria">@o.Categoría</span>
                             </div>
+                            <span class="badge bg-secondary mb-2">@o.TipoVisible</span>
                             <h5 class="card-title fw-bold text-dark mb-2"><a asp-controller="Explorar" asp-action="Detalle" asp-route-id="@o.Id" class="stretched-link text-decoration-none text-dark">@o.Título</a></h5>
                             <p class="card-text text-muted flex-grow-1">
                                 @{
@@ -157,11 +158,11 @@
                             </small>
                             @if (o.Estado == GRUPAL.Models.EstadoObjeto.Perdido)
                             {
-                                <span class="badge badge-estado-perdido">Perdido</span>
+                                <span class="badge badge-estado-perdido">Abierto</span>
                             }
                             else
                             {
-                                <span class="badge badge-estado-encontrado">Encontrado</span>
+                                <span class="badge badge-estado-encontrado">Resuelto</span>
                             }
                         </div>
                     </div>

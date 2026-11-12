@@ -57,7 +57,7 @@ public class ObjetosPerdidosController : Controller
         if (string.IsNullOrWhiteSpace(objeto.Título) || objeto.Título.Length > 150 ||
             string.IsNullOrWhiteSpace(objeto.Descripcion) || objeto.Descripcion.Length > 3000 ||
             string.IsNullOrWhiteSpace(objeto.Categoría) || objeto.Categoría.Length > 100 ||
-            objeto.Fecha == default || objeto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(objeto.Estado))
+            objeto.Fecha == default || objeto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || objeto.TipoPublicacion is not (TipoPublicacion.Dueno or TipoPublicacion.Hallazgo))
         {
             ModelState.AddModelError("", "Completa los datos del reporte con información válida.");
             return View(objeto);
@@ -66,6 +66,7 @@ public class ObjetosPerdidosController : Controller
         var rechazo = await _moderacion.ValidarObjetoAsync(objeto.Título, objeto.Descripcion);
         if (rechazo is not null) { ModelState.AddModelError("", rechazo); return View(objeto); }
         if (!Coordenadas.Validas(objeto.Latitud, objeto.Longitud)) { ModelState.AddModelError("", "Selecciona una ubicación válida."); return View(objeto); }
+        objeto.Estado = EstadoObjeto.Perdido;
         objeto.Id = 0;
         objeto.UsuarioId = usuarioId.Value;
         objeto.Ubicacion = string.IsNullOrWhiteSpace(objeto.Ubicacion) ? "No especificada" : objeto.Ubicacion.Trim();
@@ -116,7 +117,8 @@ public class ObjetosPerdidosController : Controller
             descripcion = objeto.Descripcion,
             ubicacion = objeto.Ubicacion,
             fecha = objeto.Fecha,
-            estado = objeto.Estado.ToString(),
+            estado = objeto.EstadoVisible,
+            tipoPublicacion = objeto.TipoVisible,
             fotoUrl = objeto.FotoUrl,
             autor = HttpContext.Session.GetString("UsuarioNombre") ?? "Anónimo"
         });
@@ -155,6 +157,8 @@ public class ObjetosPerdidosController : Controller
         if (!Coordenadas.Validas(datos.Latitud, datos.Longitud)) { ModelState.AddModelError("", "Selecciona una ubicación válida."); return View(datos); }
         obj.Latitud = datos.Latitud;
         obj.Longitud = datos.Longitud;
+        if (datos.TipoPublicacion is not (TipoPublicacion.Dueno or TipoPublicacion.Hallazgo)) return BadRequest();
+        obj.TipoPublicacion = datos.TipoPublicacion;
         obj.Título = datos.Título.Trim();
         obj.Categoría = datos.Categoría.Trim();
         obj.Descripcion = datos.Descripcion.Trim();

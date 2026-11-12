@@ -44,7 +44,7 @@
       estadoSobreImagen.className = "position-absolute top-0 end-0 m-2";
       const insigniaEstado = document.createElement("span");
       insigniaEstado.className = "badge badge-estado-perdido shadow-sm";
-      insigniaEstado.textContent = objeto.estado || "Perdido";
+      insigniaEstado.textContent = objeto.estado || "Abierto";
       estadoSobreImagen.appendChild(insigniaEstado);
       tarjeta.appendChild(estadoSobreImagen);
     }
@@ -55,6 +55,7 @@
     categoria.className = "badge badge-categoria mb-2 align-self-start";
     categoria.textContent = objeto.categoria || "Otros";
     cuerpo.appendChild(categoria);
+    const tipo = document.createElement("p"); tipo.className = "small fw-bold"; tipo.textContent = objeto.tipoPublicacion || "Publicado por el dueño · Busca su objeto"; cuerpo.appendChild(tipo);
 
     const titulo = document.createElement("h5");
     titulo.className = inicio ? "card-title fw-bold text-dark mb-2" : "card-title fw-bold";
@@ -82,7 +83,7 @@
     if (inicio) {
       const estado = document.createElement("span");
       estado.className = "badge badge-estado-perdido";
-      estado.textContent = objeto.estado || "Perdido";
+      estado.textContent = objeto.estado || "Abierto";
       pie.appendChild(estado);
     } else {
       const autor = document.createElement("small");

@@ -60,3 +60,6 @@ https://console.groq.com/docs/structured-outputs
 https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
 https://resend.com/docs/api-reference/emails/send-email
 https://leafletjs.com/examples/quick-start/
+
+## Corrección de tipos de publicación
+Desde codex/tipos-publicacion, se retiró Lo vi y su endpoint. Tipo de publicación separa Dueño y Hallazgo. Ambos se crean abiertos; Resuelto significa entrega o recuperación completada. Las filas históricas quedan SinEspecificar, para que su autor o administrador revise el tipo en Editar sin deducirlo de un estado ambiguo. Los ejemplos nuevos del seeder de hallazgos se crean abiertos.

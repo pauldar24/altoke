@@ -15,7 +15,7 @@
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="All" class="text-danger"></div>
 
-                <div class="mb-3"><label asp-for="Estado" class="form-label">¿Qué pasó?</label><select asp-for="Estado" class="form-select"><option value="0">Perdí un objeto</option><option value="1">Encontré un objeto</option></select></div>
+                <div class="mb-3"><label asp-for="TipoPublicacion" class="form-label">Tipo de publicación</label><select asp-for="TipoPublicacion" class="form-select"><option value="0">Soy el dueño · Perdí mi objeto</option><option value="1">Encontré un objeto · Busco a su dueño</option></select></div>
                 @* Fila 1: Título y Categoría *@
                 <div class="row mb-3">
                     <div class="col-md-6">
