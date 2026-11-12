@@ -13,6 +13,7 @@ public class Notificacion
     [MaxLength(500)] public string Texto { get; set; } = "";
     public DateTime VistoEn { get; set; }
     public DateTime CreadoEn { get; set; } = DateTime.UtcNow;
+    public bool EsChat { get; set; }
     public bool Leida { get; set; }
     public bool CorreoEnviado { get; set; }
 }

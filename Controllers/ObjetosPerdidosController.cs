@@ -34,7 +34,7 @@ public class ObjetosPerdidosController : Controller
     public async Task<IActionResult> SugerirCategoria(string? titulo, string? descripcion, CancellationToken ct)
     {
         var texto = $"{titulo?.Trim()} {descripcion?.Trim()}".Trim();
-        if (texto.Length < 8 || texto.Length > 3200) return NoContent();
+        if (texto.Length < 3 || texto.Length > 3200) return NoContent();
         var categoria = await _categoriaObjeto.PredecirAsync(texto, ct);
         return string.IsNullOrWhiteSpace(categoria) ? NoContent() : Json(new { categoria });
     }

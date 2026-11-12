@@ -1,0 +1,23 @@
+@model GRUPAL.Models.SolicitudRecuperacion
+@{ ViewData["Title"] = "Chat privado"; }
+<div class="container py-4" id="chatPrivado" data-solicitud="@Model.Id" data-usuario="@Context.Session.GetInt32("UsuarioId")">
+    <a asp-controller="Recuperaciones" asp-action="Index" asp-route-solicitud="@Model.Id">Volver a la solicitud</a>
+    <h1>Chat privado</h1><h2 class="h5">@Model.ObjetoPerdido.Título</h2>
+    <p>Solo el autor del aviso y el solicitante pueden leer esta conversación. Coordinen la entrega en un lugar seguro.</p>
+    <p><strong>Solicitud inicial</strong> @Model.Mensaje</p>
+    @if (!string.IsNullOrWhiteSpace(Model.Respuesta)) { <p><strong>Primera respuesta del autor</strong> @Model.Respuesta</p> }
+    <button id="mensajesAnteriores" class="btn btn-outline-secondary">Ver mensajes anteriores</button>
+    <div id="historialChat" class="my-3" aria-live="polite"></div>
+    <p id="estadoChat" role="status"></p>
+    @if (Model.ObjetoPerdido.Estado == GRUPAL.Models.EstadoObjeto.Perdido)
+    {
+        <form asp-action="Enviar" method="post" id="formChatPrivado">
+            @Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="claveEnvio" value="@Guid.NewGuid()" />
+            <label for="textoChat">Mensaje</label><textarea name="texto" id="textoChat" required maxlength="1000" rows="3" class="form-control"></textarea>
+            <button class="btn btn-altoke mt-2" type="submit">Enviar mensaje</button>
+        </form>
+    }
+    else { <p>El caso está resuelto. Puedes consultar el historial.</p> }
+</div>
+@section Scripts { <script src="~/js/chat-privado.js" asp-append-version="true" defer></script> }

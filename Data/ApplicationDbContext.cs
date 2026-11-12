@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext
     {
     }
 
+    public DbSet<MensajePrivado> MensajesPrivados => Set<MensajePrivado>();
     public DbSet<Notificacion> Notificaciones => Set<Notificacion>();
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<ObjetoPerdido> ObjetosPerdidos => Set<ObjetoPerdido>();
@@ -21,6 +22,12 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<MensajePrivado>(e =>
+        {
+            e.HasIndex(m => new { m.SolicitudRecuperacionId, m.AutorId, m.ClaveEnvio }).IsUnique();
+            e.HasOne(m => m.SolicitudRecuperacion).WithMany().HasForeignKey(m => m.SolicitudRecuperacionId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(m => m.Autor).WithMany().HasForeignKey(m => m.AutorId).OnDelete(DeleteBehavior.Restrict);
+        });
         modelBuilder.Entity<Notificacion>(e =>
         {
             e.HasIndex(n => new { n.UsuarioId, n.InformanteId, n.ObjetoPerdidoId, n.Texto }).IsUnique();

@@ -18,7 +18,7 @@ public sealed class CategoriaObjetoService(
     private string DirectorioModelo => environment.IsProduction()
         ? "/app/data/ml"
         : Path.Combine(environment.ContentRootPath, "ML", "Models");
-    private string RutaModelo => Path.Combine(DirectorioModelo, "categoria-objetos-v2.zip");
+    private string RutaModelo => Path.Combine(DirectorioModelo, "categoria-objetos-v3.zip");
 
     public async Task<string?> PredecirAsync(string texto, CancellationToken ct = default)
     {
@@ -70,11 +70,20 @@ public sealed class CategoriaObjetoService(
             .Where(o => !string.IsNullOrWhiteSpace(o.Título) && !string.IsNullOrWhiteSpace(o.Categoría))
             .Select(o => new EjemploCategoria
             {
-                Texto = $"{o.Título} {o.Descripcion}".Trim(),
+                Texto = o.Título.Trim(),
                 Categoria = o.Categoría.Trim()
             })
             .ToList();
 
+        var basePath = Path.Combine(environment.ContentRootPath, "ML", "categorias_base.csv");
+        if (File.Exists(basePath))
+        {
+            var categorias = new HashSet<string> { "Electrónicos", "Documentos", "Ropa", "Accesorios", "Llaves", "Mascotas", "Otros" };
+            filas = filas.Where(f => categorias.Contains(f.Categoria)).ToList();
+            filas.AddRange(File.ReadLines(basePath).Skip(1).Select(l => l.Split(';', 2))
+                .Where(p => p.Length == 2 && categorias.Contains(p[0]))
+                .Select(p => new EjemploCategoria { Categoria = p[0], Texto = p[1] }));
+        }
         if (filas.Count < 10 || filas.Select(x => x.Categoria).Distinct(StringComparer.OrdinalIgnoreCase).Count() < 2)
         {
             logger.LogInformation("Se necesitan al menos 10 avisos y dos categorías para entrenar el clasificador.");

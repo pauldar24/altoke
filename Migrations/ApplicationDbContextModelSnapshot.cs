@@ -101,6 +101,39 @@ namespace GRUPAL.Migrations
                     b.ToTable("MensajesContacto");
                 });
 
+            modelBuilder.Entity("GRUPAL.Models.MensajePrivado", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AutorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("ClaveEnvio")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreadoEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SolicitudRecuperacionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
+
+                    b.HasIndex("SolicitudRecuperacionId", "AutorId", "ClaveEnvio")
+                        .IsUnique();
+
+                    b.ToTable("MensajesPrivados");
+                });
+
             modelBuilder.Entity("GRUPAL.Models.Notificacion", b =>
                 {
                     b.Property<int>("Id")
@@ -112,6 +145,9 @@ namespace GRUPAL.Migrations
 
                     b.Property<DateTime>("CreadoEn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("EsChat")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("InformanteId")
                         .HasColumnType("INTEGER");
@@ -298,6 +334,25 @@ namespace GRUPAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("GRUPAL.Models.MensajePrivado", b =>
+                {
+                    b.HasOne("GRUPAL.Models.Usuario", "Autor")
+                        .WithMany()
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GRUPAL.Models.SolicitudRecuperacion", "SolicitudRecuperacion")
+                        .WithMany()
+                        .HasForeignKey("SolicitudRecuperacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Autor");
+
+                    b.Navigation("SolicitudRecuperacion");
                 });
 
             modelBuilder.Entity("GRUPAL.Models.Notificacion", b =>
