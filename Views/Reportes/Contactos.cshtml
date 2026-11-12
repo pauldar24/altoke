@@ -1,11 +1,11 @@
 @model List<GRUPAL.Models.MensajeContacto>
 @{ ViewData["Title"] = "Mensajes"; }
-<div class="container py-4">
+<div class="container py-4 contactos-admin">
 <h1>Mensajes</h1><p class="text-muted">La detección de posible spam es orientativa. Revisa el mensaje antes de descartarlo; puedes restaurarlo desde la bandeja Spam.</p>
 @if(TempData["Mensaje"] is string aviso){<div class="alert alert-info">@aviso</div>}
 <form method="get" class="mb-3"><select name="filtro"><option value="">Bandeja de entrada</option><option value="Spam">Spam</option><option value="Archivado">Archivados</option></select><button>Filtrar</button></form>
 @foreach(var m in Model){
-<article class="card p-3 mb-3"><h2 class="h5">@m.Asunto</h2><p>@m.Nombre · @m.Correo</p><span>@m.Clasificacion</span><p style="white-space:pre-wrap">@m.Mensaje</p>
+<article class="card p-3 mb-3"><h2 class="h5">@m.Asunto</h2><p>@m.Nombre · @m.Correo</p><span class="@(m.EsSpam || m.Clasificacion == "Posible spam (ML)" || m.Clasificacion == "Posible spam" || m.Clasificacion == "Spam/abuso" ? "etiqueta-spam" : "etiqueta-contacto")">@if(m.EsSpam || m.Clasificacion == "Posible spam (ML)" || m.Clasificacion == "Posible spam" || m.Clasificacion == "Spam/abuso"){<i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>} @(m.Clasificacion == "Posible spam (ML)" ? "Posible spam" : m.Clasificacion)</span><p style="white-space:pre-wrap">@m.Mensaje</p>
 <form asp-action="Gestionar" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@m.Id" />
 <button name="accion" value="spam">Marcar como spam</button><button name="accion" value="archivar">Archivar</button><button name="accion" value="restaurar">Restaurar</button></form>
 @if(m.RespondidoEn.HasValue){<p>Respuesta enviada · @m.Respuesta</p>}
