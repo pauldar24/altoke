@@ -15,6 +15,7 @@
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="All" class="text-danger"></div>
 
+                <div class="mb-3"><label asp-for="Estado" class="form-label">¿Qué pasó?</label><select asp-for="Estado" class="form-select"><option value="0">Perdí un objeto</option><option value="1">Encontré un objeto</option></select></div>
                 @* Fila 1: Título y Categoría *@
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -53,12 +54,12 @@
                 @* Fila 3: Fecha y Foto *@
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <label asp-for="Fecha" class="form-label fw-semibold">Fecha</label>
-                        <input asp-for="Fecha" type="date" class="form-control" required />
+                        <label asp-for="Fecha" class="form-label fw-semibold">Fecha de pérdida o hallazgo</label>
+                        <input asp-for="Fecha" type="date" max="@DateTime.UtcNow.AddHours(-5).ToString("yyyy-MM-dd")" class="form-control" required />
                         <span asp-validation-for="Fecha" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Foto</label>
+                        <label class="form-label fw-semibold">Foto opcional</label><p class="small text-muted">Si lo perdiste, añade una foto del objeto o del lugar. Si lo encontraste, recomendamos fotografiarlo.</p>
                         <input type="file" name="foto" class="form-control" accept="image/jpeg,image/png,image/webp" /><small class="text-muted">JPG, PNG o WebP · máximo 5 MB</small>
                     </div>
                 </div>

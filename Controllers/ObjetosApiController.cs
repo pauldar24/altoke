@@ -9,7 +9,7 @@ namespace GRUPAL.Controllers;
 /// <summary>API de publicaciones AlToke. Lectura pública; escritura solo con sesión y antifalsificación.</summary>
 [ApiController]
 [Route("api/objetos")]
-public class ObjetosApiController(ApplicationDbContext db) : ControllerBase
+public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.ModeracionService moderacion) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> Listar([FromQuery] string? buscar, [FromQuery] string? categoria,
@@ -43,11 +43,15 @@ public class ObjetosApiController(ApplicationDbContext db) : ControllerBase
     {
         var usuario = HttpContext.Session.GetInt32("UsuarioId");
         if (!usuario.HasValue) return Unauthorized(new { error = "Inicia sesión para publicar." });
+        if (dto.Fecha == default || dto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(dto.Estado))
+            return BadRequest(new { error = "La fecha debe ser válida y no puede ser futura." });
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        var rechazo = await moderacion.ValidarObjetoAsync(dto.Titulo, dto.Descripcion);
+        if (rechazo is not null) return BadRequest(new { error = rechazo });
         var obj = new ObjetoPerdido
         {
             Título = dto.Titulo.Trim(), Categoría = dto.Categoria.Trim(), Descripcion = dto.Descripcion.Trim(),
-            Ubicacion = dto.Ubicacion.Trim(), Fecha = dto.Fecha, Estado = EstadoObjeto.Perdido, UsuarioId = usuario.Value
+            Ubicacion = dto.Ubicacion.Trim(), Fecha = dto.Fecha, Estado = dto.Estado, UsuarioId = usuario.Value
         };
         db.ObjetosPerdidos.Add(obj);
         await db.SaveChangesAsync();
@@ -60,7 +64,11 @@ public class ObjetosApiController(ApplicationDbContext db) : ControllerBase
         var obj = await db.ObjetosPerdidos.FindAsync(id);
         if (obj is null) return NotFound();
         if (!Autorizado(obj.UsuarioId)) return Unauthorized(new { error = "No tienes permiso para editar este aviso." });
+        if (dto.Fecha == default || dto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(dto.Estado))
+            return BadRequest(new { error = "La fecha debe ser válida y no puede ser futura." });
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        var rechazo = await moderacion.ValidarObjetoAsync(dto.Titulo, dto.Descripcion);
+        if (rechazo is not null) return BadRequest(new { error = rechazo });
         obj.Título = dto.Titulo.Trim();
         obj.Categoría = dto.Categoria.Trim();
         obj.Descripcion = dto.Descripcion.Trim();

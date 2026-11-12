@@ -12,7 +12,10 @@
     @if (TempData["Exito"] is string exito) { <div class="alert alert-success">@exito</div> }
     <form asp-action="Contacto" method="post">
         @Html.AntiForgeryToken()<div asp-validation-summary="All" class="text-danger mb-2"></div>
+        @if (ViewBag.ConSesion != true)
+        {
         <div class="row"><div class="col-md-6 mb-3"><label asp-for="Nombre" class="form-label">Nombre</label><input asp-for="Nombre" class="form-control" maxlength="100" required /></div><div class="col-md-6 mb-3"><label asp-for="Correo" class="form-label">Correo</label><input asp-for="Correo" type="email" class="form-control" maxlength="150" required /></div></div>
+        }
         <div class="mb-3"><label asp-for="Asunto" class="form-label">Asunto</label><input asp-for="Asunto" class="form-control" maxlength="140" required /></div>
         <div class="mb-3"><label asp-for="Mensaje" class="form-label">Mensaje</label><textarea asp-for="Mensaje" class="form-control" rows="6" minlength="10" maxlength="3000" required></textarea></div>
         <button type="submit" class="btn btn-altoke">Enviar mensaje</button>

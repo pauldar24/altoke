@@ -19,53 +19,111 @@ namespace GRUPAL.Migrations
 
             modelBuilder.Entity("GRUPAL.Models.ArticuloAyuda", b =>
                 {
-                    b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("INTEGER");
-                    b.Property<DateTime>("CreadoEn").HasColumnType("TEXT");
-                    b.Property<string>("Pregunta").IsRequired().HasMaxLength(160).HasColumnType("TEXT");
-                    b.Property<string>("Respuesta").IsRequired().HasMaxLength(4000).HasColumnType("TEXT");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreadoEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Pregunta")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Respuesta")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
                     b.ToTable("ArticulosAyuda");
                 });
 
             modelBuilder.Entity("GRUPAL.Models.MensajeContacto", b =>
                 {
-                    b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("INTEGER");
-                    b.Property<bool>("Atendido").HasColumnType("INTEGER");
-                    b.Property<string>("Asunto").IsRequired().HasMaxLength(140).HasColumnType("TEXT");
-                    b.Property<string>("Correo").IsRequired().HasMaxLength(150).HasColumnType("TEXT");
-                    b.Property<DateTime>("CreadoEn").HasColumnType("TEXT");
-                    b.Property<string>("Mensaje").IsRequired().HasMaxLength(3000).HasColumnType("TEXT");
-                    b.Property<string>("Nombre").IsRequired().HasMaxLength(100).HasColumnType("TEXT");
-                    b.Property<string>("Sentimiento").IsRequired().HasMaxLength(20).HasColumnType("TEXT");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Archivado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Asunto")
+                        .IsRequired()
+                        .HasMaxLength(140)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Atendido")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Clasificacion")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Correo")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreadoEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("EsSpam")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Mensaje")
+                        .IsRequired()
+                        .HasMaxLength(3000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("RespondidoEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Respuesta")
+                        .HasMaxLength(3000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Sentimiento")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
                     b.ToTable("MensajesContacto");
                 });
 
             modelBuilder.Entity("GRUPAL.Models.ObjetoFavorito", b =>
                 {
-                    b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("INTEGER");
-                    b.Property<DateTime>("CreadoEn").HasColumnType("TEXT");
-                    b.Property<int>("ObjetoPerdidoId").HasColumnType("INTEGER");
-                    b.Property<int>("UsuarioId").HasColumnType("INTEGER");
-                    b.HasKey("Id");
-                    b.HasIndex("ObjetoPerdidoId");
-                    b.HasIndex("UsuarioId", "ObjetoPerdidoId").IsUnique();
-                    b.ToTable("Favoritos");
-                });
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-            modelBuilder.Entity("GRUPAL.Models.SolicitudRecuperacion", b =>
-                {
-                    b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("INTEGER");
-                    b.Property<DateTime>("CreadoEn").HasColumnType("TEXT");
-                    b.Property<int>("Estado").HasColumnType("INTEGER");
-                    b.Property<string>("Mensaje").IsRequired().HasMaxLength(1000).HasColumnType("TEXT");
-                    b.Property<int>("ObjetoPerdidoId").HasColumnType("INTEGER");
-                    b.Property<string>("Respuesta").HasMaxLength(1000).HasColumnType("TEXT");
-                    b.Property<int>("SolicitanteId").HasColumnType("INTEGER");
+                    b.Property<DateTime>("CreadoEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ObjetoPerdidoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
                     b.HasIndex("ObjetoPerdidoId");
-                    b.HasIndex("SolicitanteId", "ObjetoPerdidoId").IsUnique();
-                    b.ToTable("SolicitudesRecuperacion");
+
+                    b.HasIndex("UsuarioId", "ObjetoPerdidoId")
+                        .IsUnique();
+
+                    b.ToTable("Favoritos");
                 });
 
             modelBuilder.Entity("GRUPAL.Models.ObjetoPerdido", b =>
@@ -114,6 +172,43 @@ namespace GRUPAL.Migrations
                     b.ToTable("ObjetosPerdidos");
                 });
 
+            modelBuilder.Entity("GRUPAL.Models.SolicitudRecuperacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreadoEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Mensaje")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ObjetoPerdidoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Respuesta")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SolicitanteId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ObjetoPerdidoId");
+
+                    b.HasIndex("SolicitanteId", "ObjetoPerdidoId")
+                        .IsUnique();
+
+                    b.ToTable("SolicitudesRecuperacion");
+                });
+
             modelBuilder.Entity("GRUPAL.Models.Usuario", b =>
                 {
                     b.Property<int>("Id")
@@ -151,6 +246,25 @@ namespace GRUPAL.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("GRUPAL.Models.ObjetoFavorito", b =>
+                {
+                    b.HasOne("GRUPAL.Models.ObjetoPerdido", "ObjetoPerdido")
+                        .WithMany()
+                        .HasForeignKey("ObjetoPerdidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GRUPAL.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ObjetoPerdido");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("GRUPAL.Models.ObjetoPerdido", b =>
                 {
                     b.HasOne("GRUPAL.Models.Usuario", "Usuario")
@@ -162,23 +276,22 @@ namespace GRUPAL.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("GRUPAL.Models.ObjetoFavorito", b =>
-                {
-                    b.HasOne("GRUPAL.Models.ObjetoPerdido", "ObjetoPerdido")
-                        .WithMany().HasForeignKey("ObjetoPerdidoId").OnDelete(DeleteBehavior.Cascade).IsRequired();
-                    b.HasOne("GRUPAL.Models.Usuario", "Usuario")
-                        .WithMany().HasForeignKey("UsuarioId").OnDelete(DeleteBehavior.Cascade).IsRequired();
-                    b.Navigation("ObjetoPerdido");
-                    b.Navigation("Usuario");
-                });
-
             modelBuilder.Entity("GRUPAL.Models.SolicitudRecuperacion", b =>
                 {
                     b.HasOne("GRUPAL.Models.ObjetoPerdido", "ObjetoPerdido")
-                        .WithMany().HasForeignKey("ObjetoPerdidoId").OnDelete(DeleteBehavior.Cascade).IsRequired();
+                        .WithMany()
+                        .HasForeignKey("ObjetoPerdidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GRUPAL.Models.Usuario", "Solicitante")
-                        .WithMany().HasForeignKey("SolicitanteId").OnDelete(DeleteBehavior.Restrict).IsRequired();
+                        .WithMany()
+                        .HasForeignKey("SolicitanteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("ObjetoPerdido");
+
                     b.Navigation("Solicitante");
                 });
 
