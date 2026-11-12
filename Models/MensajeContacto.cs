@@ -11,5 +11,10 @@ public class MensajeContacto
     [Required, StringLength(3000, MinimumLength = 10)] public string Mensaje { get; set; } = string.Empty;
     public DateTime CreadoEn { get; set; } = DateTime.UtcNow;
     public bool Atendido { get; set; }
+    public bool Archivado { get; set; }
+    public bool EsSpam { get; set; }
+    [StringLength(30)] public string Clasificacion { get; set; } = "Sin clasificar";
+    [StringLength(3000)] public string? Respuesta { get; set; }
+    public DateTime? RespondidoEn { get; set; }
     [StringLength(20)] public string Sentimiento { get; set; } = "Neutro";
 }

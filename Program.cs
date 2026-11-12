@@ -26,6 +26,7 @@ builder.Services.AddScoped<AsistenteAlToke>();
 builder.Services.AddScoped<AlgoliaObjetosService>();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<ModeracionService>();
+builder.Services.AddScoped<CorreoService>();
 
 const string googleExternalCookie = "GoogleExternal";
 const string googleScheme = "Google";
