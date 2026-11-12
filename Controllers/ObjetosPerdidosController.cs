@@ -33,16 +33,16 @@ public class ObjetosPerdidosController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult EvaluarDescripcion(string descripcion)
+    public IActionResult EvaluarDescripcion(string descripcion, string? titulo, string? ubicacion)
     {
         if (!HttpContext.Session.GetInt32("UsuarioId").HasValue) return Unauthorized();
-        if (string.IsNullOrWhiteSpace(descripcion) || descripcion.Length is < 10 or > 3000)
+        if (string.IsNullOrWhiteSpace(descripcion) || descripcion.Length is < 10 or > 3000 || titulo?.Length > 150 || ubicacion?.Length > 200)
             return BadRequest("Escribe una descripción de entre 10 y 3000 caracteres.");
         var resultado = _calidad.TieneDetalle(descripcion);
         return Json(new { detalleSuficiente = resultado, recomendacion = resultado switch
         {
-            true => "La descripción aporta características que pueden ayudar a reconocer el objeto. Comprueba que sean correctas.",
-            false => "Podrías añadir color, marca, rasgos particulares y ubicación aproximada. Evita publicar datos personales.",
+            true => ConsejosDescripcion.Crear(true, descripcion, titulo, ubicacion),
+            false => ConsejosDescripcion.Crear(false, descripcion, titulo, ubicacion),
             _ => "La revisión no está disponible. Puedes continuar revisando la descripción manualmente."
         } });
     }
