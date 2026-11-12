@@ -101,6 +101,48 @@ namespace GRUPAL.Migrations
                     b.ToTable("MensajesContacto");
                 });
 
+            modelBuilder.Entity("GRUPAL.Models.Notificacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("CorreoEnviado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreadoEn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("InformanteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Leida")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ObjetoPerdidoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("VistoEn")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ObjetoPerdidoId");
+
+                    b.HasIndex("UsuarioId", "InformanteId", "ObjetoPerdidoId", "Texto")
+                        .IsUnique();
+
+                    b.ToTable("Notificaciones");
+                });
+
             modelBuilder.Entity("GRUPAL.Models.ObjetoFavorito", b =>
                 {
                     b.Property<int>("Id")
@@ -244,6 +286,25 @@ namespace GRUPAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("GRUPAL.Models.Notificacion", b =>
+                {
+                    b.HasOne("GRUPAL.Models.ObjetoPerdido", "ObjetoPerdido")
+                        .WithMany()
+                        .HasForeignKey("ObjetoPerdidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GRUPAL.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ObjetoPerdido");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("GRUPAL.Models.ObjetoFavorito", b =>
