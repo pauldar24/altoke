@@ -10,7 +10,7 @@
 <button name="accion" value="spam">Marcar como spam</button><button name="accion" value="archivar">Archivar</button><button name="accion" value="restaurar">Restaurar</button></form>
 @if(m.RespondidoEn.HasValue){<p>Respuesta enviada · @m.Respuesta</p>}
 else if(!m.EsSpam){
-<form asp-action="Gestionar" method="post" class="mt-3">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@m.Id" /><label for="respuesta-@m.Id">Respuesta por correo</label><textarea id="respuesta-@m.Id" name="respuesta" required maxlength="3000" class="form-control"></textarea><button name="accion" value="responder" class="btn btn-altoke mt-2">Responder y enviar correo</button></form>}
+<form asp-action="Gestionar" method="post" class="mt-3">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@m.Id" /><label for="respuesta-@m.Id">Respuesta por correo</label><textarea id="respuesta-@m.Id" name="respuesta" required maxlength="3000" class="form-control">@m.Respuesta</textarea><button name="accion" value="responder" class="btn btn-altoke mt-2">Responder y enviar correo</button></form>}
 </article>}
 @if(!Model.Any()){<p>No hay mensajes en esta bandeja.</p>}
 </div>

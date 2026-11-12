@@ -96,6 +96,10 @@
             <button class="btn btn-altoke mt-2">Avisar al dueño</button>
         </form>
     }
+    @if (Model.Latitud.HasValue && Model.Longitud.HasValue)
+    {
+        <div id="mapaUbicacion" style="height:320px" data-lat="@Model.Latitud.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-lng="@Model.Longitud.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)"></div>
+    }
     @if (relacionados.Any())
     {
         <h3 class="fw-bold mt-5 mb-3">También podría interesarte</h3>

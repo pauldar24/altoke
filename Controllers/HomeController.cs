@@ -12,12 +12,14 @@ public class HomeController : Controller
     private readonly ApplicationDbContext _context;
     private readonly SentimientoService _sentimiento;
     private readonly ModeracionService _moderacion;
+    private readonly TurnstileService _turnstile;
 
-    public HomeController(ApplicationDbContext context, SentimientoService sentimiento, ModeracionService moderacion)
+    public HomeController(ApplicationDbContext context, SentimientoService sentimiento, ModeracionService moderacion, TurnstileService turnstile)
     {
         _context = context;
         _sentimiento = sentimiento;
         _moderacion = moderacion;
+        _turnstile = turnstile;
     }
 
     public async Task<IActionResult> Index()
@@ -42,7 +44,7 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Contacto()
+    public IActionResult Contacto()
     {
         ViewBag.ConSesion = HttpContext.Session.GetInt32("UsuarioId").HasValue;
         return View(new MensajeContacto());
@@ -62,6 +64,8 @@ public class HomeController : Controller
             ModelState.Remove(nameof(contacto.Nombre));
             ModelState.Remove(nameof(contacto.Correo));
         }
+        if (!usuarioId.HasValue && !await _turnstile.VerificarAsync(Request.Form["cf-turnstile-response"], "contacto"))
+            ModelState.AddModelError("", "Completa la verificación antiabuso. Si no aparece, contacta al administrador.");
         if (!ModelState.IsValid) return View(contacto);
         contacto.Id = 0;
         contacto.Nombre = contacto.Nombre.Trim();

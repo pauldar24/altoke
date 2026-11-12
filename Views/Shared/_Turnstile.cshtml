@@ -1,0 +1,7 @@
+@inject IConfiguration Configuration
+@model string
+@if (!string.IsNullOrWhiteSpace(Configuration["Turnstile:SiteKey"]))
+{
+    <div class="cf-turnstile mb-3" data-sitekey="@Configuration["Turnstile:SiteKey"]" data-action="@Model"></div>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+}

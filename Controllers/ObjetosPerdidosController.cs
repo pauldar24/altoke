@@ -65,6 +65,7 @@ public class ObjetosPerdidosController : Controller
         if (!ModelState.IsValid) return View(objeto);
         var rechazo = await _moderacion.ValidarObjetoAsync(objeto.Título, objeto.Descripcion);
         if (rechazo is not null) { ModelState.AddModelError("", rechazo); return View(objeto); }
+        if (!Coordenadas.Validas(objeto.Latitud, objeto.Longitud)) { ModelState.AddModelError("", "Selecciona una ubicación válida."); return View(objeto); }
         objeto.Id = 0;
         objeto.UsuarioId = usuarioId.Value;
         objeto.Ubicacion = string.IsNullOrWhiteSpace(objeto.Ubicacion) ? "No especificada" : objeto.Ubicacion.Trim();
@@ -151,6 +152,9 @@ public class ObjetosPerdidosController : Controller
         }
         var rechazo = await _moderacion.ValidarObjetoAsync(datos.Título, datos.Descripcion);
         if (rechazo is not null) { ModelState.AddModelError("", rechazo); return View(datos); }
+        if (!Coordenadas.Validas(datos.Latitud, datos.Longitud)) { ModelState.AddModelError("", "Selecciona una ubicación válida."); return View(datos); }
+        obj.Latitud = datos.Latitud;
+        obj.Longitud = datos.Longitud;
         obj.Título = datos.Título.Trim();
         obj.Categoría = datos.Categoría.Trim();
         obj.Descripcion = datos.Descripcion.Trim();
