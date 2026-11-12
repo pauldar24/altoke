@@ -86,6 +86,16 @@
             }
         </div>
     </div>
+    @if (sesion.HasValue && !dueno && Model.Estado == EstadoObjeto.Perdido)
+    {
+        <form asp-controller="Notificaciones" asp-action="LoVi" method="post" class="card p-3 mt-4">
+            @Html.AntiForgeryToken()<input type="hidden" name="id" value="@Model.Id" />
+            <h3 class="h5">Lo vi</h3>
+            <label for="lugarVisto">¿Dónde lo viste?</label><input id="lugarVisto" name="lugar" maxlength="200" required class="form-control" />
+            <label for="horaVista">Fecha y hora en Perú</label><input id="horaVista" name="vistoEn" type="datetime-local" max="@DateTime.UtcNow.AddHours(-5).ToString("yyyy-MM-ddTHH:mm")" required class="form-control" />
+            <button class="btn btn-altoke mt-2">Avisar al dueño</button>
+        </form>
+    }
     @if (relacionados.Any())
     {
         <h3 class="fw-bold mt-5 mb-3">También podría interesarte</h3>

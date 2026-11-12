@@ -58,6 +58,11 @@
                         }
                         @if (Context.Session.GetInt32("UsuarioId").HasValue)
                         {
+                            <li class="nav-item dropdown" id="campanaNotificaciones">
+                                @Html.AntiForgeryToken()
+                                <button class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notificaciones">🔔 <span id="contadorNotificaciones">0</span></button>
+                                <div class="dropdown-menu dropdown-menu-end p-2" id="listaNotificaciones" style="width:320px;max-height:400px;overflow:auto"></div>
+                            </li>
                             <li class="nav-item"><a class="nav-link text-dark" asp-controller="Favoritos" asp-action="Index">Favoritos</a></li>
                             <li class="nav-item"><a class="nav-link text-dark" asp-controller="Recuperaciones" asp-action="Index">Recuperaciones <span id="contadorRecuperaciones" class="badge bg-danger" hidden></span></a></li>
                             <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Contacto">Contacto</a></li>
@@ -154,6 +159,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@10.0.11/dist/browser/signalr.min.js" defer></script>
     <script src="~/js/objetos-tiempo-real.js" asp-append-version="true" defer></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/notificaciones.js" asp-append-version="true" defer></script>
     <script src="~/js/recuperaciones.js" asp-append-version="true" defer></script>
     <partial name="_AsistenteChat" />
     <script src="~/js/asistente.js" asp-append-version="true" defer></script>
