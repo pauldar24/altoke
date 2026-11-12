@@ -36,8 +36,7 @@ Los avisos anteriores sin coordenadas siguen funcionando.
 - Fecha de pérdida o hallazgo con máximo hoy (hora de Perú), validada en creación,
   edición y API. Publicación Perdí/Encontré con foto opcional y texto aclaratorio.
 - Contactos: Consulta, Queja, Sugerencia, Spam/abuso o Sin clasificar.
-  El sentimiento ML.NET se conserva como dato orientativo, pero el buzón muestra
-  la clasificación de moderación y las acciones spam, responder, archivar, restaurar.
+  El buzón muestra la clasificación de moderación y las acciones spam, responder, archivar, restaurar.
   Los contactos históricos se mantienen disponibles para revisión.
 - Campana con contador de no leídas, lista de 50 recientes y lectura individual.
 - Lo vi: requiere sesión, aviso perdido y usuario distinto del dueño.
@@ -63,3 +62,8 @@ https://leafletjs.com/examples/quick-start/
 
 ## Corrección de tipos de publicación
 Desde codex/tipos-publicacion, se retiró Lo vi y su endpoint. Tipo de publicación separa Dueño y Hallazgo. Ambos se crean abiertos; Resuelto significa entrega o recuperación completada. Las filas históricas quedan SinEspecificar, para que su autor o administrador revise el tipo en Editar sin deducirlo de un estado ambiguo. Los ejemplos nuevos del seeder de hallazgos se crean abiertos.
+
+## Chat privado y categorías
+El chat se abre desde solicitudes aceptadas y solo admite a sus dos participantes. Al cerrar el caso queda en modo de lectura. Los mensajes generan una notificación que abre el chat. La entrega usa SignalR y recuperación periódica si se interrumpe la conexión.
+La categoría se sugiere una vez al salir del título (mínimo tres caracteres). El modelo v3 se prepara antes de atender peticiones y se entrena con ML/categorias_base.csv y los títulos válidos existentes. El tiempo de preparación se traslada al arranque del servicio.
+Se retiraron el servicio de sentimiento y su dataset. El campo histórico se conserva en la base para mantener compatibilidad de datos, pero ya no se calcula ni se muestra como satisfacción.

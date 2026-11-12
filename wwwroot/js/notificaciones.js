@@ -28,6 +28,7 @@
     if (window.signalR) {
         const conexion = new signalR.HubConnectionBuilder().withUrl('/hubs/objetos').withAutomaticReconnect().build();
         conexion.on('NotificacionRecibida', cargar);
+        conexion.on('ChatActualizado', id => window.dispatchEvent(new CustomEvent('altoke-chat', { detail: id })));
         conexion.onreconnected(cargar);
         async function conectar() { try { await conexion.start(); await cargar(); } catch { setTimeout(conectar, 10000); } }
         conectar();

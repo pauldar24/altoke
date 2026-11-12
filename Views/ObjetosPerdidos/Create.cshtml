@@ -37,7 +37,7 @@
                         </select>
                         <span asp-validation-for="Categoría" class="text-danger"></span>
                         <div id="sugerenciaCategoria" class="alert alert-info py-2 mt-2" hidden aria-live="polite">
-                            Categoría sugerida y aplicada: <strong id="categoriaSugerida"></strong>
+                            Sugerencia automática: <strong id="categoriaSugerida"></strong>
                             <small>Puedes cambiarla en el selector. Se sugiere una sola vez al terminar el título.</small>
                         </div>
                     </div>
@@ -94,7 +94,7 @@
             categoria.addEventListener('change', () => { seleccionManual = true; });
             titulo.addEventListener('blur', async () => {
                 const original = titulo.value.trim();
-                if (consultado || seleccionManual || categoria.value || original.length < 8) return;
+                if (consultado || seleccionManual || categoria.value || original.length < 3) return;
                 consultado = true;
                 contenedor.hidden = false;
                 texto.textContent = 'Analizando el título…';
@@ -111,7 +111,7 @@
                     }
                     if (![...categoria.options].some(o => o.value === sugerida)) throw new Error('Categoría inválida');
                     categoria.value = sugerida;
-                    texto.textContent = sugerida;
+                    texto.textContent = sugerida + ' (aplicada)';
                 } catch {
                     texto.textContent = 'No disponible. Selecciona la categoría manualmente.';
                 }

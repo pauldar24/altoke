@@ -20,7 +20,6 @@ if (!string.IsNullOrEmpty(port))
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<RecomendadorObjetos>();
-builder.Services.AddSingleton<SentimientoService>();
 builder.Services.AddSingleton<CategoriaObjetoService>();
 builder.Services.AddScoped<AsistenteAlToke>();
 builder.Services.AddScoped<AlgoliaObjetosService>();
@@ -141,6 +140,9 @@ using (var scope = app.Services.CreateScope())
     if (app.Configuration.GetValue<bool>("SeedDemoData"))
         await DbSeeder.SeedAsync(db);
 }
+
+// Preparar el clasificador antes de aceptar peticiones de publicación.
+await app.Services.GetRequiredService<CategoriaObjetoService>().PredecirAsync("audífonos");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

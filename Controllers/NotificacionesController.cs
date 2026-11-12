@@ -13,7 +13,7 @@ public class NotificacionesController(ApplicationDbContext db) : Controller
         var usuario = HttpContext.Session.GetInt32("UsuarioId");
         if (usuario is null) return Unauthorized();
         var lista = await db.Notificaciones.AsNoTracking().Where(n => n.UsuarioId == usuario)
-            .OrderByDescending(n => n.Id).Take(50)
+            .OrderByDescending(n => n.CreadoEn).ThenByDescending(n => n.Id).Take(50)
             .Select(n => new { n.Id, n.Texto, n.Leida, n.ObjetoPerdidoId }).ToListAsync();
         var noLeidas = await db.Notificaciones.CountAsync(n => n.UsuarioId == usuario && !n.Leida);
         return Json(new { noLeidas, lista });
@@ -28,6 +28,7 @@ public class NotificacionesController(ApplicationDbContext db) : Controller
         if (aviso is null) return NotFound();
         aviso.Leida = true;
         await db.SaveChangesAsync();
+        if (aviso.EsChat && aviso.SolicitudRecuperacionId.HasValue) return RedirectToAction("Index", "ChatPrivado", new { id = aviso.SolicitudRecuperacionId });
         if (aviso.SolicitudRecuperacionId.HasValue) return RedirectToAction("Index", "Recuperaciones", new { solicitud = aviso.SolicitudRecuperacionId });
         return RedirectToAction("Detalle", "Explorar", new { id = aviso.ObjetoPerdidoId });
     }

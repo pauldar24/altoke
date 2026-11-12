@@ -36,9 +36,9 @@
             {
                 <form method="post" asp-action="Resolver" class="mb-2">
                     @Html.AntiForgeryToken()<input type="hidden" name="id" value="@s.Id"/><input type="hidden" name="estado" value="Aceptada"/>
-                    <label for="respuesta-@s.Id" class="form-label small">Cómo coordinar la devolución (visible solo para el solicitante)</label>
+                    <label for="respuesta-@s.Id" class="form-label small">Primer mensaje para iniciar la coordinación</label>
                     <textarea id="respuesta-@s.Id" name="respuesta" class="form-control mb-2" rows="2" maxlength="1000" required placeholder="Ej.: Nos vemos en seguridad de la universidad..."></textarea>
-                    <button type="submit" class="btn btn-altoke btn-sm">Aceptar y responder</button>
+                    <button type="submit" class="btn btn-altoke btn-sm">Aceptar y habilitar chat privado</button>
                 </form>
                 <form method="post" asp-action="Resolver">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@s.Id"/><input type="hidden" name="estado" value="Rechazada"/><button type="submit" class="btn btn-outline-secondary btn-sm">Rechazar</button></form>
             }
@@ -46,6 +46,7 @@
             {
                 <div class="alert alert-light border mt-3 mb-0"><strong>Respuesta del autor:</strong><p class="mb-0" style="white-space:pre-wrap">@s.Respuesta</p></div>
             }
+            @if (s.Estado == EstadoSolicitud.Aceptada) { <a asp-controller="ChatPrivado" asp-action="Index" asp-route-id="@s.Id" class="btn btn-altoke mt-3">Abrir chat privado</a> }
             @if (s.Estado == EstadoSolicitud.Aceptada) { <p class="text-muted small mt-2 mb-0">Coordinen la entrega de manera segura. Aceptar no cierra automáticamente la publicación.</p> }
         </div></div>
     }

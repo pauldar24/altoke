@@ -28,16 +28,14 @@ Las claves no se incluyen en el código. Usa variables de entorno `SECCION__CLAV
 | `ConnectionStrings__Redis` | Sesiones con caché distribuida; si se omite usa memoria local |
 | `Groq__ApiKey`, `Groq__Model`, `Groq__BaseUrl` | Asistente de IA opcional; sin clave funciona la respuesta local basada en publicaciones y FAQ |
 | `Algolia__ApplicationId`, `Algolia__SearchApiKey`, `Algolia__AdminApiKey`, `Algolia__IndexName` | Autocompletado externo y sincronización desde el panel, opcional |
-| `Sentimiento__Enabled` | Activa el clasificador ML.NET de mensajes de contacto (activo por defecto) |
 | `SeedDemoData` | Habilita datos de muestra en una base vacía; activo por defecto |
 
 El botón **Continuar con Google** solo aparece cuando están definidas ambas credenciales. Google devuelve el perfil y correo para iniciar sesión; AlToke no pide permisos para leer Gmail. Los secretos se guardan como variables privadas en Render, nunca en `appsettings.json`.
 
 ## Modelos de Machine Learning
 
-AlToke integra dos modelos ML.NET, sin GPU ni un servicio externo de inferencia:
+AlToke integra un clasificador de categorías con ML.NET, sin GPU ni un servicio externo de inferencia:
 
-- **Sentimiento binario:** clasifica los mensajes de contacto como positivos o negativos. Se entrena con `ML/comentarios_entrenamiento.csv`, evalúa una partición reservada del 20 % y luego ajusta el artefacto final con todos los ejemplos. El panel muestra la etiqueta como apoyo; no sustituye la revisión humana.
 - **Categoría multiclase:** sugiere una categoría a partir del título y la descripción en el formulario de publicación. Se entrena con los avisos de SQLite cuando hay al menos 10 avisos y dos categorías; la persona siempre confirma la opción. El panel administrativo permite reentrenarlo.
 
 Los artefactos se guardan en `/app/data/ml` en Render. Si el servicio no tiene disco persistente, los modelos pueden volver a entrenarse desde los datos de la aplicación después de un reinicio; para conservar SQLite y los modelos, conecta un disco persistente montado en `/app/data`.
@@ -78,7 +76,7 @@ Groq, Algolia y Cloudinary ya tienen rutas de respaldo locales. Su código despl
 | Catálogo, detalle, búsqueda y filtros | Objetos con detalle, filtros y paginación | Incorporada |
 | Guardar productos | Favoritos de objetos | Incorporada |
 | Recomendaciones ML.NET por productos | Motor de afinidad según publicaciones y favoritos | Alternativa de dominio; **sin entrenamiento colaborativo ML.NET** |
-| Mensajes y reportes + sentimiento | Contacto, reporte administrativo y modelo ML.NET | Incorporada (clasificación orientativa) |
+| Mensajes y reportes | Contacto, moderación de mensajes y respuesta administrativa | Incorporada |
 | Asistente Groq/Semantic Kernel | Asistente contextual con Groq opcional y modo local | Adaptada; no usa Semantic Kernel |
 | Documentos Qdrant | Base de preguntas/respuestas en SQLite | Alternativa local, **sin Qdrant ni embeddings** |
 | Algolia búsqueda/indexación | Búsqueda sugerida local y Algolia opcional | Incorporada con configuración externa |
@@ -113,5 +111,6 @@ La validación estática, el análisis de sintaxis de JavaScript con Node y la i
 - Las llamadas que escriben datos tienen protección antifalsificación. La API está pensada para clientes autenticados del mismo origen; Swagger muestra documentación, pero no suministra automáticamente tokens CSRF.
 - Persistencia en Render/Docker: monta un volumen para `/app/data` y configura almacenamiento de imágenes externo como Cloudinary si no quieres perder subidas locales tras reinicios.
 - Si no hay Redis la sesión se almacena en memoria, por lo que se pierde tras reinicios y no se comparte entre instancias.
-- El análisis de sentimiento es probabilístico y puede equivocarse; los resultados solo orientan la revisión de los administradores.
 - No se comparten correos privados de los autores en el buscador ni en el asistente. La respuesta a una solicitud la ven las personas involucradas.
+
+El análisis de satisfacción se retiró. Las solicitudes aceptadas cuentan con chat privado entre sus dos participantes; al resolver el caso se conserva el historial. El clasificador de categorías se prepara durante el arranque con ejemplos base incluidos y los avisos existentes, antes de atender el formulario.

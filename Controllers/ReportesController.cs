@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GRUPAL.Controllers;
 
 [TypeFilter(typeof(AdminAuthFilter))]
-public class ReportesController(ApplicationDbContext db, SentimientoService sentimiento, CorreoService correo) : Controller
+public class ReportesController(ApplicationDbContext db, CorreoService correo) : Controller
 {
     public async Task<IActionResult> Contactos(string? filtro, DateTime? fecha)
     {
@@ -22,14 +22,6 @@ public class ReportesController(ApplicationDbContext db, SentimientoService sent
         ViewBag.Filtro = filtro;
         ViewBag.Fecha = fecha?.ToString("yyyy-MM-dd");
         return View(await consulta.OrderByDescending(x => x.CreadoEn).Take(250).ToListAsync());
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Reentrenar()
-    {
-        TempData["Mensaje"] = await sentimiento.ReentrenarAsync()
-            ? "Modelo ML.NET reentrenado correctamente." : "No se pudo reentrenar el modelo. Revisa la configuración.";
-        return RedirectToAction(nameof(Contactos));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
