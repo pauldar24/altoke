@@ -1,0 +1,8 @@
+@model GRUPAL.Models.ObjetoPerdido
+<div class="mb-3">
+    <p>Marca en el mapa la ubicación aproximada. Evita señalar tu domicilio. El punto será público.</p>
+    <input asp-for="Latitud" type="hidden" value="@Model?.Latitud?.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+    <input asp-for="Longitud" type="hidden" value="@Model?.Longitud?.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+    <div id="mapaUbicacion" style="height:320px" aria-label="Mapa de ubicación"></div>
+    <button id="limpiarUbicacion" type="button" class="btn btn-outline-secondary mt-2">Quitar punto</button>
+</div>

@@ -9,6 +9,8 @@ public class ObjetoPerdido
     public DateTime Fecha { get; set; }
     public string Ubicacion { get; set; } = string.Empty;
     public EstadoObjeto Estado { get; set; }
+    public double? Latitud { get; set; }
+    public double? Longitud { get; set; }
     public string? FotoUrl { get; set; }
 
     public int UsuarioId { get; set; }

@@ -1,3 +1,4 @@
+using GRUPAL.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GRUPAL.Data;
@@ -15,11 +16,13 @@ public class CuentaController : Controller
     private readonly ApplicationDbContext _context;
     private readonly PasswordHasher<Usuario> _hasher = new();
     private readonly IConfiguration _configuration;
+    private readonly TurnstileService _turnstile;
 
-    public CuentaController(ApplicationDbContext context, IConfiguration configuration)
+    public CuentaController(ApplicationDbContext context, IConfiguration configuration, TurnstileService turnstile)
     {
         _context = context;
         _configuration = configuration;
+        _turnstile = turnstile;
     }
 
     // GET: Cuenta/CrearCuenta
@@ -49,6 +52,8 @@ public class CuentaController : Controller
             ViewBag.Error = "Usa un nombre y correo válidos y una contraseña de entre 8 y 128 caracteres.";
             return View();
         }
+        if (!await _turnstile.VerificarAsync(Request.Form["cf-turnstile-response"], "registro"))
+        { ViewBag.Error = "Completa la verificación antiabuso. Si no aparece, contacta al administrador."; return View(); }
         var existeCorreo = await _context.Usuarios.AnyAsync(u => u.Correo == correo);
         if (existeCorreo)
         {

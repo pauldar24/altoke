@@ -194,6 +194,12 @@ namespace GRUPAL.Migrations
                     b.Property<string>("FotoUrl")
                         .HasColumnType("TEXT");
 
+                    b.Property<double?>("Latitud")
+                        .HasColumnType("REAL");
+
+                    b.Property<double?>("Longitud")
+                        .HasColumnType("REAL");
+
                     b.Property<string>("Título")
                         .IsRequired()
                         .HasMaxLength(150)

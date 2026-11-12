@@ -47,6 +47,14 @@ public class ReportesController(ApplicationDbContext db, SentimientoService sent
                 if (string.IsNullOrWhiteSpace(respuesta) || respuesta.Length > 3000)
                     return BadRequest("Escribe una respuesta de hasta 3000 caracteres.");
                 if (contacto.RespondidoEn.HasValue) return RedirectToAction(nameof(Contactos));
+                await db.MensajesContacto.Where(m => m.Id == id && m.Respuesta == null)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.Respuesta, respuesta));
+                await db.Entry(contacto).ReloadAsync();
+                if (contacto.Respuesta != respuesta)
+                {
+                    TempData["Mensaje"] = "Ya existe una respuesta preparada. Reintenta con ese mismo texto.";
+                    return RedirectToAction(nameof(Contactos));
+                }
                 if (!await correo.EnviarAsync(contacto.Correo, "Respuesta de AlToke", respuesta, $"contacto-{id}-{respuesta}"))
                 {
                     TempData["Mensaje"] = "No se pudo enviar. Revisa la configuración de Resend y vuelve a intentarlo.";

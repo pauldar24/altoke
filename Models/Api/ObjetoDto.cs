@@ -3,6 +3,8 @@ namespace GRUPAL.Models.Api;
 
 public class ObjetoDto
 {
+    public double? Latitud { get; set; }
+    public double? Longitud { get; set; }
     public int Id { get; set; }
     [Required, StringLength(150)] public string Titulo { get; set; } = string.Empty;
     [Required, StringLength(100)] public string Categoria { get; set; } = string.Empty;

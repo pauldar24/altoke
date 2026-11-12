@@ -45,12 +45,13 @@ public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.Moder
         if (!usuario.HasValue) return Unauthorized(new { error = "Inicia sesión para publicar." });
         if (dto.Fecha == default || dto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(dto.Estado))
             return BadRequest(new { error = "La fecha debe ser válida y no puede ser futura." });
+        if (!Coordenadas.Validas(dto.Latitud, dto.Longitud)) return BadRequest(new { error = "Coordenadas inválidas." });
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         var rechazo = await moderacion.ValidarObjetoAsync(dto.Titulo, dto.Descripcion);
         if (rechazo is not null) return BadRequest(new { error = rechazo });
         var obj = new ObjetoPerdido
         {
-            Título = dto.Titulo.Trim(), Categoría = dto.Categoria.Trim(), Descripcion = dto.Descripcion.Trim(),
+            Latitud = dto.Latitud, Longitud = dto.Longitud, Título = dto.Titulo.Trim(), Categoría = dto.Categoria.Trim(), Descripcion = dto.Descripcion.Trim(),
             Ubicacion = dto.Ubicacion.Trim(), Fecha = dto.Fecha, Estado = dto.Estado, UsuarioId = usuario.Value
         };
         db.ObjetosPerdidos.Add(obj);
@@ -66,9 +67,12 @@ public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.Moder
         if (!Autorizado(obj.UsuarioId)) return Unauthorized(new { error = "No tienes permiso para editar este aviso." });
         if (dto.Fecha == default || dto.Fecha.Date > DateTime.UtcNow.AddHours(-5).Date || !Enum.IsDefined(dto.Estado))
             return BadRequest(new { error = "La fecha debe ser válida y no puede ser futura." });
+        if (!Coordenadas.Validas(dto.Latitud, dto.Longitud)) return BadRequest(new { error = "Coordenadas inválidas." });
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         var rechazo = await moderacion.ValidarObjetoAsync(dto.Titulo, dto.Descripcion);
         if (rechazo is not null) return BadRequest(new { error = rechazo });
+        obj.Latitud = dto.Latitud;
+        obj.Longitud = dto.Longitud;
         obj.Título = dto.Titulo.Trim();
         obj.Categoría = dto.Categoria.Trim();
         obj.Descripcion = dto.Descripcion.Trim();
@@ -95,7 +99,7 @@ public class ObjetosApiController(ApplicationDbContext db, GRUPAL.Services.Moder
 
     private static ObjetoDto Mapear(ObjetoPerdido o) => new()
     {
-        Id = o.Id, Titulo = o.Título, Categoria = o.Categoría, Descripcion = o.Descripcion,
+        Latitud = o.Latitud, Longitud = o.Longitud, Id = o.Id, Titulo = o.Título, Categoria = o.Categoría, Descripcion = o.Descripcion,
         Ubicacion = o.Ubicacion, Fecha = o.Fecha, Estado = o.Estado, FotoUrl = o.FotoUrl, Autor = o.Usuario?.Nombre
     };
 }

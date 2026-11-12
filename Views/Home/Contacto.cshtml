@@ -18,6 +18,7 @@
         }
         <div class="mb-3"><label asp-for="Asunto" class="form-label">Asunto</label><input asp-for="Asunto" class="form-control" maxlength="140" required /></div>
         <div class="mb-3"><label asp-for="Mensaje" class="form-label">Mensaje</label><textarea asp-for="Mensaje" class="form-control" rows="6" minlength="10" maxlength="3000" required></textarea></div>
+        @if (ViewBag.ConSesion != true) { <partial name="_Turnstile" model='@("contacto")' /> }
         <button type="submit" class="btn btn-altoke">Enviar mensaje</button>
     </form>
 </div></div></div></div>

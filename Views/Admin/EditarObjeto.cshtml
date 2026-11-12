@@ -43,7 +43,7 @@
                         </div>
                         <div class="mb-3">
                             <label asp-for="Fecha" class="form-label fw-bold">Fecha</label>
-                            <input asp-for="Fecha" type="date" class="form-control" />
+                            <input asp-for="Fecha" type="date" max="@DateTime.UtcNow.AddHours(-5).ToString("yyyy-MM-dd")" class="form-control" />
                             <span asp-validation-for="Fecha" class="text-danger"></span>
                         </div>
                         <div class="mb-4">
