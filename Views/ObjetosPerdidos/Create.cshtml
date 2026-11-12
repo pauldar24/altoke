@@ -49,6 +49,8 @@
                     <textarea asp-for="Descripcion" id="descripcionObjeto" class="form-control" rows="4" maxlength="3000"
                               placeholder="Describe el objeto con el mayor detalle posible: color, marca, tamaño, dónde lo viste por última vez..." required></textarea>
                     <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    <button type="button" id="revisarDescripcion" class="btn btn-outline-secondary mt-2">Revisar si mi descripción es clara</button>
+                    <p id="resultadoDescripcion" class="alert alert-info mt-2" role="status" hidden></p>
                 </div>
 
                 @* Fila 3: Fecha y Foto *@
@@ -80,6 +82,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/calidad-aviso.js" asp-append-version="true" defer></script>
     <script>
         (() => {
             const titulo = document.getElementById('tituloObjeto');

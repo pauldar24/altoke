@@ -3,7 +3,7 @@ namespace GRUPAL.Services;
 /// <summary>Detecta posible spam/abuso, independientemente de que un mensaje exprese satisfacción o una queja.</summary>
 public sealed class ModeloSpamService(IWebHostEnvironment env, ILogger<ModeloSpamService> logger) : IDisposable
 {
-    private readonly ModeloTextoBinario _modelo = new("spam", env, logger);
+    private readonly ModeloTextoBinario _modelo = new("spam", env, logger, 0.85f);
     public void Preparar() => _modelo.Preparar();
     public bool? EsSpam(string texto)
     {

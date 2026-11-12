@@ -114,3 +114,6 @@ La validación estática, el análisis de sintaxis de JavaScript con Node y la i
 - No se comparten correos privados de los autores en el buscador ni en el asistente. La respuesta a una solicitud la ven las personas involucradas.
 
 El análisis de satisfacción se retiró. Las solicitudes aceptadas cuentan con chat privado entre sus dos participantes; al resolver el caso se conserva el historial. El clasificador de categorías se prepara durante el arranque con ejemplos base incluidos y los avisos existentes, antes de atender el formulario.
+
+## Tres modelos adicionales orientados a recuperar objetos
+Coincidencias entre pérdida y hallazgo, detección de posible spam y revisión opcional de claridad de descripciones. Son modelos ML.NET entrenados de forma independiente, además del clasificador de categoría existente. Investigación, datasets iniciales, evaluación, límites y pasos de demostración en [MODELOS_ML_ALTOKE.md](MODELOS_ML_ALTOKE.md).
